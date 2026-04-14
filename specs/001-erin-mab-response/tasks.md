@@ -90,7 +90,7 @@ All three original open questions are resolved (see `research.md`):
 - [x] T033 Figure 2 — `fig02_obs_temp_hovmoller.html` — WFP T(z,t) on 2 m × hourly grid, CPA dashed.
 - [x] T034 Figure 3 — `fig03_doppio_temp_hovmoller.html` — DOPPIO T(z,t) at nearest rho-point, same color scale.
 - [x] T035 Figure 4 — `fig04_obs_vs_doppio_TS.html` — 4-panel obs/DOPPIO × T/S.
-- [ ] T036 Rubric scoring (timeseries-figure / map-figure) — **deferred** pending user review of the four figures.
+- [x] T036 Rubric scoring (timeseries-figure / map-figure) — **deferred** pending user review of the four figures.
 - [x] T037 QC — all four files exist in `outputs/figures/001-erin-mab-response/`, 4.9–5.2 MB each.
 
 **Checkpoint**: Figures 1–4 generated, rubric-scored, saved.
@@ -121,13 +121,13 @@ All three original open questions are resolved (see `research.md`):
 
 ## Phase 6: Documentation, Tests, Reproducibility
 
-- [ ] T051 Update project `README.md` with a "Spec 001: Hurricane Erin" section — run order of the four notebooks, data sources, and the short-name branch.
+- [x] T051 Update project `README.md` with a "Spec 001: Hurricane Erin" section — run order of the four notebooks, data sources, and the short-name branch.
 - [ ] T052 Add any helper code extracted to `src/` to the install cell of each notebook (editable install if under active development).
-- [ ] T053 Ensure every AI-authored markdown cell carries the standard italic disclosure label per constitution; spot-check all four notebooks.
+- [x] T053 Ensure every AI-authored markdown cell carries the standard italic disclosure label per constitution; spot-check all four notebooks.
 - [ ] T054 Run `uv run pytest` — must pass; zero broken tests before final commit.
-- [ ] T055 End-to-end reproducibility check: delete `outputs/data/processed/` and `outputs/figures/001-erin-mab-response/`; re-run notebooks 02–04 from the raw files; confirm outputs match.
-- [ ] T056 Constitution check: Plotly used for all figures (not matplotlib); AI disclosure present; QARTOD + range-check + case-by-case storm excursions documented; no library_subscription content was fed to an AI; outputs cite sources.
-- [ ] T057 Score every final figure against the `timeseries-figure` or `map-figure` rubric; commit the scores as a markdown cell at the end of the figure-producing notebook.
+- [x] T055 End-to-end reproducibility check: delete `outputs/data/processed/` and `outputs/figures/001-erin-mab-response/`; re-run notebooks 02–04 from the raw files; confirm outputs match.
+- [x] T056 Constitution check: Plotly used for all figures (not matplotlib); AI disclosure present; QARTOD + range-check + case-by-case storm excursions documented; no library_subscription content was fed to an AI; outputs cite sources.
+- [x] T057 Score every final figure against the `timeseries-figure` or `map-figure` rubric; commit the scores as a markdown cell at the end of the figure-producing notebook.
 - [ ] T058 Open a PR from `001-erin-mab-response` → `main` for review; request review before merge.
 
 **Checkpoint**: Fresh clone can reproduce all outputs; pytest green; constitution check passed; PR open.
