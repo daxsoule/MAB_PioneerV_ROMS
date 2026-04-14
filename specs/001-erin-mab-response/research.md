@@ -40,11 +40,18 @@ notebook 02 and re-runs downstream in seconds.
 
 ## Phase 0.2 — CP13N deployment coverage
 
-**Decision (default)**: Assume the deployment of
-`CP13NOPM-WFP01-03-CTDPFK000` spanning the Erin window profiles from
-near the surface to ≥50 m, sufficient for a mixed-layer analysis. The
-usable-depth audit in notebook 02 confirms this before downstream
-stages run.
+**Status update (2026-04-14)**: Local kdata inspection resolved the
+deployment question without a round-trip to OOI Data Explorer. The
+deployment0002 aggregate NetCDF of the recovered wire-following
+profiler stream spans **2025-04-15 → 2025-11-06** — the entire 2025
+Atlantic hurricane season. So Erin is covered by a recovered (i.e.,
+post-deployment, calibrated, QARTOD'd) stream.
+
+**Decision (default)**: Read deployment0002 from
+`/home/jovyan/ooi/kdata/CP13NOPM-WFP01-03-CTDPFK000-recovered_wfp-ctdpf_ckl_wfp_instrument_recovered/`
+directly. The depth-coverage audit still runs in notebook 02 before
+downstream stages — the deployment being long does not guarantee
+surface → ≥50 m coverage at every profile.
 
 **Fallback plan** if the audit fails (depth range too shallow or too
 gappy):

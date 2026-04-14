@@ -118,9 +118,11 @@ MAB_PioneerV_ROMS/
 
 - **Phase 0.1**: Retrieve Erin 2025 NHC best track and define the
   event window (pre-storm start, closest-approach time, recovery end).
-- **Phase 0.2**: Confirm `CP13NOPM-WFP01-03-CTDPFK000` has a
-  deployment covering that window and audit its depth coverage
-  (target: surface → ≥50 m for mixed-layer work).
+- **Phase 0.2**: ~~Confirm `CP13NOPM-WFP01-03-CTDPFK000` has a
+  deployment covering that window~~ **Resolved**: deployment0002 in
+  kdata covers 2025-04-15 → 2025-11-06, spanning the whole 2025
+  Atlantic hurricane season. Depth-coverage audit still needed at
+  the QC/align stage.
 - **Phase 0.3**: Pin the DOPPIO dataset URL and version for the event
   window (check availability on Rutgers THREDDS).
 
@@ -128,18 +130,31 @@ Decisions and alternatives recorded in `research.md`.
 
 ### Stage 1: Data Acquisition — `notebooks/01_download_erin_data.ipynb`
 
-- **Input**:
-  - NHC best-track archive for Hurricane Erin (2025).
-  - OOI M2M API / Data Explorer for
-    `CP13NOPM-WFP01-03-CTDPFK000` across the event window.
-  - Rutgers THREDDS/OPeNDAP for DOPPIO subset (bounding box ± buffer
-    around CP13N, full sigma, event window + buffer).
-- **Output**:
-  - `outputs/data/raw/erin_nhc_besttrack.csv`
-  - `outputs/data/raw/CP13NOPM_WFP01_03_CTDPFK000_<window>.nc`
-  - `outputs/data/raw/doppio_CP13N_<window>.nc`
-  - `outputs/data/README.md` updated with URLs, versions, and
-    retrieval dates.
+**Observations (no download — local mirror available)**:
+
+- **Source**: `/home/jovyan/ooi/kdata/CP13NOPM-WFP01-03-CTDPFK000-recovered_wfp-ctdpf_ckl_wfp_instrument_recovered/`
+- **Deployment covering Erin**: `deployment0002_*_20250415T180015-20251106T152833.nc`
+  (aggregate file; ~2025-04-15 through 2025-11-06 — entire Atlantic
+  hurricane season of 2025).
+- **Action**: Read the deployment0002 aggregate NetCDF directly,
+  subset to the event window in memory, write the subset to
+  `outputs/data/raw/CP13NOPM_WFP01_03_CTDPFK000_erin.nc`.
+- **Fallback**: If recovered has a gap around the storm, use
+  telemetered (`.../telemetered-ctdpf_ckl_wfp_instrument/`, deployment0002)
+  with a note.
+
+**Downloads**:
+
+- **NHC best-track archive** for Hurricane Erin (2025).
+- **DOPPIO subset** from Rutgers THREDDS/OPeNDAP (bounding box ± buffer
+  around CP13N, full sigma, event window + buffer).
+
+**Output**:
+- `outputs/data/raw/erin_nhc_besttrack.csv`
+- `outputs/data/raw/CP13NOPM_WFP01_03_CTDPFK000_erin.nc`
+- `outputs/data/raw/doppio_CP13N_<window>.nc`
+- `outputs/data/README.md` updated with the kdata source path, NHC
+  retrieval URL + date, and DOPPIO dataset URL + version + date.
 
 ### Stage 2: QC & Alignment — `notebooks/02_qc_and_align.ipynb`
 
