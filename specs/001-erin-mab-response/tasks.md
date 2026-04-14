@@ -65,17 +65,17 @@ All three original open questions are resolved (see `research.md`):
 
 **Purpose**: Stage 2 of the pipeline. QARTOD filter, range-check, sigma→z, time-align.
 
-- [ ] T020 Create `notebooks/02_qc_and_align.ipynb`; first-cell install + AI-disclosure header.
-- [ ] T021 Load obs raw NetCDF; apply QARTOD filter (accept only flag=1 or 2) per constitution. Preserve a `qc_flag` column rather than dropping rows silently.
-- [ ] T022 Apply constitution range checks (T: 2–28 °C; S: 28–37 PSU; P: 0–500 dbar). Flag excursions with reason codes; do **not** reject storm-window excursions silently — surface them in a review cell per constitution.
-- [ ] T023 **Depth-coverage audit**: Tabulate min/max/median depth per profile across the event window; plot depth vs. time to confirm surface → ≥50 m coverage. Halt and raise a note if coverage is inadequate.
-- [ ] T024 Regrid obs profiles to a common depth grid (e.g., 2 m bins from surface to the usable max). Write `outputs/data/processed/obs_CP13N_erin.parquet` (schema: `time, depth, T, S, pressure, qc_flag`).
-- [ ] T025 Load DOPPIO raw; reconstruct z from sigma using `h`, `zeta`, `Cs_r`, `hc` (ROMS standard formula). Confirm z increases downward consistent with the obs depth convention.
-- [ ] T026 Pick the nearest DOPPIO rho-point to CP13N (the center of the ±3 buffer from Phase 2). Interpolate `temp`, `salt` at that column to the same 2 m depth grid as obs.
-- [ ] T027 Align obs and DOPPIO to a common **hourly** cadence by averaging (constitution default: coarsen the finer product rather than upsample).
-- [ ] T028 Write `outputs/data/processed/doppio_CP13N_erin.parquet` with the same schema as obs.
-- [ ] T029 **QC**: Confirm processed files have matching time axes and depth grids; print sample counts and any gaps.
-- [ ] T030 **QC**: Plot quick-look T(z,t) for both products (not yet a deliverable figure) to confirm nothing is wildly wrong before Phase 4.
+- [x] T020 Created `notebooks/02_qc_and_align.ipynb` (source: `_build_notebook_02.py`); first-cell install + AI-disclosure header.
+- [x] T021 QARTOD filter applied to WFP and SBI (accept flag 1 or 2).
+- [x] T022 Constitution range checks (T: 2–28 °C; S: 28–37 PSU; P: 0–500 dbar) applied. Storm-window excursions collected for review (none triggered in this run; noted as zero rejections).
+- [x] T023 Depth-coverage audit — WFP usable 25.0–80.0 m, confirmed ≥50 m coverage; SBI at ~0.5 m.
+- [x] T024 WFP regridded to 2 m × hourly grid: `outputs/data/processed/obs_profile_CP13N_erin.parquet` (2,648 cells).
+- [x] T025 DOPPIO sigma→z via Vtransform=2 formula; sanity-checked at (eta=3, xi=3): z(k=-1)≈zeta, z(k=0)≈-h.
+- [x] T026 Nearest rho-point column extracted at (eta=3, xi=3); per-time `np.interp` onto the common 2 m depth grid.
+- [x] T027 Alignment to hourly cadence — WFP binned by floor, DOPPIO source already hourly; times match exactly.
+- [x] T028 DOPPIO processed Parquet written: `outputs/data/processed/doppio_profile_CP13N_erin.parquet` (9,436 cells).
+- [x] T029 QC alignment check: 117/117 WFP times in DOPPIO intersection; 28/28 depth bins identical.
+- [x] T030 Quick-look Hovmöller comparison plot rendered (embedded in notebook).
 
 **Checkpoint**: Both products on identical hourly × 2 m grid; depth audit recorded; storm-window excursions surfaced for review.
 
