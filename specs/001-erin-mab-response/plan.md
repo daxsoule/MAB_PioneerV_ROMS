@@ -116,15 +116,20 @@ MAB_PioneerV_ROMS/
 
 ### Phase 0: Research & Confirmation (BEFORE bulk download)
 
-- **Phase 0.1**: Retrieve Erin 2025 NHC best track and define the
-  event window (pre-storm start, closest-approach time, recovery end).
+- **Phase 0.1**: ~~Retrieve Erin 2025 NHC best track and define the
+  event window~~ **Resolved 2026-04-14**. Event window
+  2025-08-15 to 2025-08-29; CPA 2025-08-21 12:00 UTC. Source:
+  NHC TCR AL052025_Erin.pdf.
 - **Phase 0.2**: ~~Confirm `CP13NOPM-WFP01-03-CTDPFK000` has a
   deployment covering that window~~ **Resolved**: deployment0002 in
   kdata covers 2025-04-15 → 2025-11-06, spanning the whole 2025
   Atlantic hurricane season. Depth-coverage audit still needed at
   the QC/align stage.
-- **Phase 0.3**: Pin the DOPPIO dataset URL and version for the event
-  window (check availability on Rutgers THREDDS).
+- **Phase 0.3**: ~~Pin the DOPPIO dataset URL and version for the event
+  window~~ **Resolved 2026-04-14**. Use operational `2017_da` run,
+  hourly `History_Best` aggregation:
+  `https://tds.marine.rutgers.edu/thredds/dodsC/roms/doppio/2017_da/his/History_Best`.
+  Reanalysis V3R3 does not cover Aug 2025.
 
 Decisions and alternatives recorded in `research.md`.
 
@@ -145,9 +150,15 @@ Decisions and alternatives recorded in `research.md`.
 
 **Downloads**:
 
-- **NHC best-track archive** for Hurricane Erin (2025).
-- **DOPPIO subset** from Rutgers THREDDS/OPeNDAP (bounding box ± buffer
-  around CP13N, full sigma, event window + buffer).
+- **NHC TCR** for Erin (AL052025):
+  https://www.nhc.noaa.gov/data/tcr/AL052025_Erin.pdf — extract
+  6-hourly positions from Table 1 into a simple CSV.
+- **DOPPIO hourly subset** from Rutgers operational `2017_da` run:
+  `https://tds.marine.rutgers.edu/thredds/dodsC/roms/doppio/2017_da/his/History_Best`
+  — time slice 2025-08-15 to 2025-08-29, spatial bounding box around
+  CP13N (nearest `xi_rho`/`eta_rho` ± a small index buffer), all
+  40 `s_rho` levels, variables `temp`, `salt`, and the grid
+  reconstruction fields (`Cs_r`, `hc`, `h`, `zeta`, `lon_rho`, `lat_rho`).
 
 **Output**:
 - `outputs/data/raw/erin_nhc_besttrack.csv`

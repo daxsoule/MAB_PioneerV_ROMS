@@ -11,16 +11,27 @@ sensitivity check is cheap.
 
 ---
 
-## Phase 0.1 — Erin (2025) event window
+## Phase 0.1 — Erin (2025) event window — RESOLVED 2026-04-14
 
-**Decision (default)**: Event window bracketed as roughly two weeks
-spanning Hurricane Erin's closest approach to the MAB South array,
-with the exact bounds set from the NOAA NHC best-track archive during
-notebook 01. Three sub-windows:
+**Status**: Resolved from NHC TCR AL052025_Erin.pdf (issued 2026-01-30).
 
-- **Pre-storm**: ~5 days ending 24 h before closest approach.
-- **Storm**: closest approach ± 24 h.
-- **Recovery**: ~7 days starting 24 h after closest approach.
+**Erin life cycle**:
+- Genesis 2025-08-11 (Cabo Verde hurricane).
+- Cat 5 peak 2025-08-16 18:00 UTC (140 kt, 913 mb).
+- **Closest approach to MAB South** (~37°N, 75°W): **2025-08-21
+  12:00 UTC** at 34.9°N, 71.7°W — 378 km / 204 nmi SE of the array.
+- Cat 2 at CPA (90 kt, 949 mb).
+- Became extratropical 2025-08-22 18:00 UTC north of CPA point.
+- Merged with extratropical low ~2025-08-28.
+- NDBC buoy 44014 (Virginia Beach, ~36.6°N, 74.8°W — close to MAB
+  South) recorded min SLP 1001 mb at 2025-08-21 11:00 UTC with
+  34-kt sustained winds. Useful sanity check for forcing.
+
+**Event window (decided)**: 2025-08-15 to 2025-08-29 (14 days).
+
+- **Pre-storm**: 2025-08-15 to 2025-08-20 (5 days ending 24 h before CPA).
+- **Storm**: 2025-08-20 to 2025-08-22 (CPA ± 24 h).
+- **Recovery**: 2025-08-22 to 2025-08-29 (7 days post-storm).
 
 **Rationale**: 24 h around closest approach captures the surface-
 forced mixing response at a fixed mooring without bleeding into
@@ -69,26 +80,43 @@ scope and require the user to re-approve the spec.
 
 ---
 
-## Phase 0.3 — DOPPIO dataset version
+## Phase 0.3 — DOPPIO dataset version — RESOLVED 2026-04-14
 
-**Decision (default)**: Use the most recent DOPPIO operational or
-reanalysis product on Rutgers THREDDS that covers the Erin window.
-Pin the full OPeNDAP URL, dataset version/identifier, and retrieval
-date in `outputs/data/README.md` and in the Stage 1 notebook's first
-markdown cell.
+**Status**: Resolved from Rutgers THREDDS catalog probe.
 
-**Rationale**: DOPPIO has operational and reanalysis streams with
-different data-assimilation cadences; the reanalysis version, when
-available, is preferred because it is retrospective and better
-quality-controlled. If only operational is available for the event
-window, use that and note it.
+**DOPPIO runs on Rutgers THREDDS**:
+- Reanalysis **V3R3** (`DopAnV3R3-ini2007`): 2007–**2024**. Does
+  **not** cover Aug 2025 — cannot use for Erin.
+- Reanalysis V2R3 (`DopAnV2R3-ini2007`): 2007–2020 (older, too short).
+- Operational **`2017_da`** (Real-Time PSAS Forecast System):
+  Nov 2017 – present, daily forecast cycles with rolling "Best"
+  aggregation. **This is the run for Erin.**
 
-**Alternatives considered**: Running our own ROMS simulation —
-rejected, out of scope for a student demo.
+**Decision**: Use operational `2017_da` run.
 
-**Reversible?** Yes — switching DOPPIO versions is a URL change in
-notebook 01 and a full re-run downstream. Cheap enough to re-run with
-a second version as a sensitivity check if time permits.
+- **Hourly history (primary)**:
+  `https://tds.marine.rutgers.edu/thredds/dodsC/roms/doppio/2017_da/his/History_Best`
+- **Daily averages (alternative)**:
+  `https://tds.marine.rutgers.edu/thredds/dodsC/roms/doppio/2017_da/avg/Best_Excluding_Day1`
+  (drops day-1 forecast in favour of analysis/nowcast — slightly
+  cleaner for retrospective comparison).
+
+**Variables**: `temp`, `salt` (ROMS standard). 40 sigma levels at
+rho-points (`s_rho=0..39`); `Cs_r`, `Cs_w`, `hc`, `h`, `zeta` needed
+to reconstruct z. Curvilinear C-grid with `lon_rho`, `lat_rho`;
+subset by `xi_rho`/`eta_rho` indices after nearest-neighbour lookup,
+not by lon/lat slicing.
+
+**Access**: public OPeNDAP, no authentication.
+
+**Caveat**: Operational runs include data-assimilation increments
+(per the constitution's Model Humility principle). Increments may
+produce discrete step-like features in the time series — flag but do
+not "fix."
+
+**Reversible?** Yes — switching to daily `Best_Excluding_Day1` is a
+URL change. If the operational hourly has an unexpected gap across
+the Erin window, the daily is the immediate fallback.
 
 ---
 

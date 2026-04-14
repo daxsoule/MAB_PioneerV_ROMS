@@ -33,8 +33,11 @@ tuned to climatology rather than to individual storms.
   (Full site-code decoding — nominal depth range, position, and
   intended deployment cadence — to be confirmed from the OOI asset
   catalog at the download step.)
-- **Coverage**: ~2 weeks bracketing Hurricane Erin's closest approach
-  to the array in 2025 (pre-storm baseline, storm passage, recovery).
+- **Coverage**: **2025-08-15 to 2025-08-29** (14 days). Event anchor is
+  Erin's closest approach at **2025-08-21 12:00 UTC** (~378 km SE of
+  the array, Cat 2 at CPA, storm ID AL052025). Pre-storm buffer
+  2025-08-15 to 2025-08-20; storm 2025-08-20 to 2025-08-22; recovery
+  2025-08-22 to 2025-08-29.
 - **Format**: NetCDF from OOI Data Explorer / M2M API; recovered-
   instrument stream preferred over telemetered if timing allows, else
   telemetered with a note.
@@ -64,7 +67,11 @@ tuned to climatology rather than to individual storms.
 
 ### Tertiary Data — Storm Track
 
-- **Source**: NOAA NHC best-track archive for Hurricane Erin (2025).
+- **Source**: NOAA NHC Tropical Cyclone Report for Hurricane Erin
+  (AL052025): https://www.nhc.noaa.gov/data/tcr/AL052025_Erin.pdf
+  (final, issued 2026-01-30). HURDAT2 for 2025 not yet released;
+  use TCR Table 1 6-hourly best-track positions until HURDAT2
+  appears at https://www.nhc.noaa.gov/data/hurdat/.
 - **Purpose**: Define the event window (closest approach to the focal
   mooring ± pre-storm and recovery buffers); sanity-check forcing.
 - **Access**: NHC public archive (CSV/KML). Downloaded by script with
