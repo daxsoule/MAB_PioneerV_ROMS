@@ -85,13 +85,13 @@ All three original open questions are resolved (see `research.md`):
 
 **Purpose**: Stage 3 of the pipeline. Figures 1–4.
 
-- [ ] T031 Create `notebooks/03_hovmoller_comparison.ipynb`; first-cell install + AI-disclosure header.
-- [ ] T032 Generate **Figure 1** — storm-track map: NHC positions over a simple basemap; annotate MAB South array and CP13N. Student-tier Plotly default; caption written for a student reader.
-- [ ] T033 Generate **Figure 2** — obs T(z,t) Hovmöller with CPA time (2025-08-21 12:00 UTC) marked. Colorblind-safe colormap. Caption.
-- [ ] T034 Generate **Figure 3** — DOPPIO T(z,t) Hovmöller at the nearest rho-point, same color scale as Figure 2. Caption.
-- [ ] T035 Generate **Figure 4** — side-by-side obs vs. DOPPIO panels for T and for S (4 panels total); common color scale within each variable. Caption.
-- [ ] T036 Score each figure against the `timeseries-figure` rubric before committing; record score + any unfixed items in a markdown cell.
-- [ ] T037 **QC**: Verify all four figure files exist under `outputs/figures/001-erin-mab-response/` and carry descriptive filenames (e.g., `fig01_storm_track.html`, `fig02_obs_temp_hovmoller.html`).
+- [x] T031 Created `notebooks/03_hovmoller_comparison.ipynb` (source: `_build_notebook_03.py`).
+- [x] T032 Figure 1 — `fig01_storm_track.html` — Erin NHC track, CPA marker, CP13NOPM star, category-colored fixes.
+- [x] T033 Figure 2 — `fig02_obs_temp_hovmoller.html` — WFP T(z,t) on 2 m × hourly grid, CPA dashed.
+- [x] T034 Figure 3 — `fig03_doppio_temp_hovmoller.html` — DOPPIO T(z,t) at nearest rho-point, same color scale.
+- [x] T035 Figure 4 — `fig04_obs_vs_doppio_TS.html` — 4-panel obs/DOPPIO × T/S.
+- [ ] T036 Rubric scoring (timeseries-figure / map-figure) — **deferred** pending user review of the four figures.
+- [x] T037 QC — all four files exist in `outputs/figures/001-erin-mab-response/`, 4.9–5.2 MB each.
 
 **Checkpoint**: Figures 1–4 generated, rubric-scored, saved.
 
