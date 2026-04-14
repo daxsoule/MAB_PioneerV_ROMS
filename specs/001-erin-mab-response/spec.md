@@ -41,9 +41,13 @@ tuned to climatology rather than to individual storms.
 - **Format**: NetCDF from OOI Data Explorer / M2M API; recovered-
   instrument stream preferred over telemetered if timing allows, else
   telemetered with a note.
-- **Access**: https://dataexplorer.oceanobservatories.org/ (download
-  via UI or OOINet API); local mirror at `/home/jovyan/ooi/kdata/` if
-  available for the MAB South assets.
+- **Access**: Local mirror at
+  `/home/jovyan/ooi/kdata/CP13NOPM-WFP01-03-CTDPFK000-recovered_wfp-ctdpf_ckl_wfp_instrument_recovered/`
+  — deployment0002 aggregate covers 2025-04-15 → 2025-11-06 (full
+  2025 Atlantic hurricane season). **No download required.**
+  Fallback to OOI Data Explorer
+  (https://dataexplorer.oceanobservatories.org/) only if the kdata
+  mirror is unavailable or the deployment is replaced.
 - **Known issues**:
   - Array is new — QARTOD flags still maturing for some instruments.
   - Depth coverage varies by deployment (apply the CP02PMUO lesson:
@@ -82,8 +86,10 @@ tuned to climatology rather than to individual storms.
 ## Methods Overview
 
 1. **Data preparation**:
-   - Download observations for the focal mooring and the event window.
-   - Download DOPPIO output for the same window + a buffer.
+   - Read observations for the focal mooring from the local kdata
+     mirror and subset to the event window.
+   - Download DOPPIO output for the same window + a buffer from
+     Rutgers THREDDS/OPeNDAP.
    - Audit the observation record's depth coverage across the deployment(s)
      that span the event; document the usable depth range.
    - Convert DOPPIO sigma → z at the mooring location; select the grid
@@ -126,9 +132,9 @@ audience and keeps the first spec simple.
 
 ### Notebooks (self-contained, per constitution)
 
-- `notebooks/01_download_erin_data.ipynb` — downloads observations,
-  DOPPIO slice, and NHC track. Installs its own dependencies; writes
-  raw files to `outputs/data/raw/`.
+- `notebooks/01_download_erin_data.ipynb` — reads observations from
+  local kdata; downloads DOPPIO slice and NHC track. Installs its own
+  dependencies; writes raw files to `outputs/data/raw/`.
 - `notebooks/02_qc_and_align.ipynb` — QARTOD filtering, sigma→z
   conversion, time alignment, usable-depth audit. Writes tidy
   Parquet/NetCDF to `outputs/data/processed/`.
@@ -197,13 +203,17 @@ audience and keeps the first spec simple.
 
 ## Assumptions & Limitations
 
+**Resolved context** (was assumption; now confirmed from NHC TCR
+AL052025, commit `52eeff5`):
+- Hurricane Erin (2025) passed ~378 km SE of the MAB South array at
+  2025-08-21 12:00 UTC as a Cat 2 (90 kt / 949 mb). A measurable T/S
+  response is expected given the very large wind field reported in
+  the TCR; the magnitude at CP13N is what this analysis quantifies.
+
 **Assumptions**:
-- Hurricane Erin (2025) did pass close enough to the Pioneer MAB South
-  array to produce a resolvable T/S response. This must be confirmed
-  from the NHC track before committing to the event window.
-- The focal mooring chosen will be a profiler mooring capable of
-  resolving the upper-water-column vertical structure needed for a
-  mixed-layer analysis. Surface-only moorings are insufficient.
+- The focal mooring chosen is a profiler mooring capable of resolving
+  the upper-water-column vertical structure needed for a mixed-layer
+  analysis. Surface-only moorings are insufficient.
 - DOPPIO output covering the Erin window is publicly available on
   THREDDS.
 - A single mooring plus the nearest DOPPIO grid cell is sufficient to
@@ -227,10 +237,14 @@ audience and keeps the first spec simple.
   (Plotly student-first) consistent; QC rules (QARTOD 1 or 2, case-
   by-case storm review) consistent; self-contained notebook rule
   acknowledged.
-- Open clarifications that do **not** block spec approval but will
-  need resolution before the plan stage:
+- Phase 0 clarifications (resolved unless noted):
   - ~~Which exact MAB South reference designator is the focal mooring?~~
     **Resolved 2026-04-14: `CP13NOPM-WFP01-03-CTDPFK000`.**
-  - Does the deployment spanning Erin have adequate depth coverage
-    for a mixed-layer analysis (needs surface to at least ~50 m)?
-  - DOPPIO dataset version/URL for the Erin window — pin at retrieval.
+  - ~~DOPPIO dataset version/URL for the Erin window.~~
+    **Resolved 2026-04-14: operational `2017_da` run,
+    `History_Best` hourly aggregation on Rutgers THREDDS
+    (see `research.md` Phase 0.3 and `outputs/data/README.md`).**
+  - **Deferred to QC stage**: does the CP13N deployment spanning Erin
+    have adequate depth coverage for a mixed-layer analysis (surface
+    → ≥50 m)? Audited in `notebooks/02_qc_and_align.ipynb`
+    (tasks T019, T023).

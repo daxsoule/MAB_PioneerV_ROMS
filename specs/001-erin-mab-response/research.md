@@ -184,6 +184,17 @@ and QARTOD'd. Telemetered data are real-time and less mature.
 
 ---
 
+## Deferred to a future spec / pass
+
+- **Bilinear interpolation sensitivity check** (from Phase 0.5). The
+  nearest-neighbour choice stands for spec 001. Bilinear was
+  originally planned as a parallel cross-check but is **deferred** —
+  not a required task. Revisit when spec 001 is complete, or when a
+  reviewer asks whether the comparison is sensitive to the horizontal
+  interpolation method. Cheap to add: duplicate the DOPPIO extraction
+  at T015–T016 with `xesmf` or a manual bilinear, then append a
+  column to `comparison_stats.csv`.
+
 ## Open items not yet decided
 
 - **Inertial-response analysis**: T/S mixed-layer response is primary;
