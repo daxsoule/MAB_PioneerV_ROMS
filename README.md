@@ -6,7 +6,16 @@ Model–observation comparison between the **OOI Pioneer MAB South
 
 ## Status
 
-New project — scaffold only. Scientific spec pending (`/speckit.specify`).
+Spec 001 (`specs/001-erin-mab-response/`): Hurricane Erin (2025) vs.
+DOPPIO — constitution, spec, plan, research, and tasks in place.
+Implementation in progress on branch `001-erin-mab-response`.
+
+## Notebook format
+
+Notebooks are plain `.ipynb` only — no jupytext paired `.py`. Per
+constitution, each notebook is self-contained: it installs its own
+pinned dependencies in the first code cell so it can run in Colab
+or any fresh Jupyter environment without the project's `uv` venv.
 
 ## Layout
 

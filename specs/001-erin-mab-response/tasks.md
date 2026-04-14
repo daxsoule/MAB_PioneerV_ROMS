@@ -31,10 +31,10 @@ All three original open questions are resolved (see `research.md`):
 
 ## Phase 1: Setup
 
-- [ ] T004 Create `notebooks/` directory structure (already exists; confirm empty before starting).
-- [ ] T005 Create `outputs/figures/001-erin-mab-response/` and `outputs/tables/001-erin-mab-response/`.
-- [ ] T006 Confirm `.gitignore` already blocks `outputs/data/raw/*.nc` and `outputs/data/processed/*.parquet` (spot-check).
-- [ ] T007 Add notebook-authoring helper: decide whether to use `jupytext` paired `.py` files for diff-friendly review. (Document choice in a one-line note in the project README.)
+- [x] T004 Create `notebooks/` directory structure (already exists; empty — confirmed 2026-04-14).
+- [x] T005 Create `outputs/figures/001-erin-mab-response/` and `outputs/tables/001-erin-mab-response/` (done 2026-04-14).
+- [x] T006 Confirm `.gitignore` blocks `outputs/data/**/*.nc` and `outputs/data/**/*.parquet` — **fixed 2026-04-14**: patterns were `outputs/data/*.nc` (top-level only), widened to `outputs/data/**/*.{nc,zarr,parquet,pdf}` to cover subdirs.
+- [x] T007 Notebook format: **plain `.ipynb` only** (no jupytext paired `.py`). Decided 2026-04-14. Recorded in project README.
 
 **Checkpoint**: Directory structure in place; `.gitignore` covers large data; notebook format decision recorded.
 

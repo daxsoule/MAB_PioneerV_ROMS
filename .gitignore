@@ -17,7 +17,9 @@ wheels/
 .venv/
 .DS_Store
 
-# Large data caches — keep raw downloads out of git
-outputs/data/*.nc
-outputs/data/*.zarr
-outputs/data/*.parquet
+# Large data caches — keep raw downloads and processed slices out of git
+# (matches files in outputs/data/ and any subdir like raw/, processed/)
+outputs/data/**/*.nc
+outputs/data/**/*.zarr
+outputs/data/**/*.parquet
+outputs/data/**/*.pdf
