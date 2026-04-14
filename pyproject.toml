@@ -1,0 +1,23 @@
+[project]
+name = "mab-pioneerv-roms"
+version = "0.1.0"
+description = "Add your description here"
+requires-python = ">=3.12"
+dependencies = [
+    "ipykernel>=7.2.0",
+    "jupyter>=1.1.1",
+    "matplotlib>=3.10.8",
+    "nbformat>=5.10.4",
+    "netcdf4>=1.7.4",
+    "numpy>=2.4.4",
+    "pandas>=3.0.2",
+    "plotly>=6.7.0",
+    "xarray>=2026.4.0",
+]
+
+[dependency-groups]
+dev = [
+    "markdown>=3.10.2",
+    "pytest>=9.0.3",
+    "weasyprint>=68.1",
+]

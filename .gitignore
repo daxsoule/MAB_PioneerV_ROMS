@@ -1,0 +1,23 @@
+# Literature — never commit external publisher PDFs (see literature/README.md)
+# This ONLY blocks files under literature/. Generated artifacts under
+# outputs/ are deliberately allowed: they are reproducible from version-
+# controlled scripts and are not subject to publisher licensing.
+literature/**/*.pdf
+literature/**/*.epub
+literature/**/*.djvu
+
+# Python / Jupyter cruft
+__pycache__/
+*.py[cod]
+*.egg-info/
+build/
+dist/
+wheels/
+.ipynb_checkpoints/
+.venv/
+.DS_Store
+
+# Large data caches — keep raw downloads out of git
+outputs/data/*.nc
+outputs/data/*.zarr
+outputs/data/*.parquet
