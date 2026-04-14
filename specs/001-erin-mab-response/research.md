@@ -18,8 +18,8 @@ sensitivity check is cheap.
 **Erin life cycle**:
 - Genesis 2025-08-11 (Cabo Verde hurricane).
 - Cat 5 peak 2025-08-16 18:00 UTC (140 kt, 913 mb).
-- **Closest approach to MAB South** (~37°N, 75°W): **2025-08-21
-  12:00 UTC** at 34.9°N, 71.7°W — 378 km / 204 nmi SE of the array.
+- **Closest approach to MAB South** (~36.17°N, 74.83°W): **2025-08-21
+  12:00 UTC** at 34.9°N, 71.7°W — 316 km / 171 nmi SE of the array.
 - Cat 2 at CPA (90 kt, 949 mb).
 - Became extratropical 2025-08-22 18:00 UTC north of CPA point.
 - Merged with extratropical low ~2025-08-28.

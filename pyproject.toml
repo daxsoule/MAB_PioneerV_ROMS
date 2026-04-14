@@ -25,3 +25,7 @@ dev = [
     "pytest>=9.0.3",
     "weasyprint>=68.1",
 ]
+
+[tool.pytest.ini_options]
+pythonpath = ["."]
+testpaths = ["tests"]

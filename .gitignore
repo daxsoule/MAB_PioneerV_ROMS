@@ -28,3 +28,4 @@ outputs/data/**/*.pdf
 # The constitution PDF + its source md remain tracked intentionally.
 outputs/docs/methods_*.md
 outputs/docs/methods_*.pdf
+outputs/data/raw/.nfs*

@@ -39,7 +39,7 @@ tuned to climatology rather than to individual storms.
   - **Depth gap 0.5–25 m** is unsampled on this mooring — documented
     limitation (see Limitations).
 - **Coverage**: **2025-08-15 to 2025-08-29** (14 days). Event anchor is
-  Erin's closest approach at **2025-08-21 12:00 UTC** (~378 km SE of
+  Erin's closest approach at **2025-08-21 12:00 UTC** (~316 km SE of
   the array, Cat 2 at CPA, storm ID AL052025). Pre-storm buffer
   2025-08-15 to 2025-08-20; storm 2025-08-20 to 2025-08-22; recovery
   2025-08-22 to 2025-08-29.
@@ -210,7 +210,7 @@ audience and keeps the first spec simple.
 
 **Resolved context** (was assumption; now confirmed from NHC TCR
 AL052025, commit `52eeff5`):
-- Hurricane Erin (2025) passed ~378 km SE of the MAB South array at
+- Hurricane Erin (2025) passed ~316 km SE of the MAB South array at
   2025-08-21 12:00 UTC as a Cat 2 (90 kt / 949 mb). A measurable T/S
   response is expected given the very large wind field reported in
   the TCR; the magnitude at CP13N is what this analysis quantifies.
@@ -248,6 +248,28 @@ AL052025, commit `52eeff5`):
   (Plotly student-first) consistent; QC rules (QARTOD 1 or 2, case-
   by-case storm review) consistent; self-contained notebook rule
   acknowledged.
+## Post-analysis note (added 2026-04-14)
+
+Erin's closest approach to CP13NOPM was ~316 km SE — well outside the
+inner wind field. The storm affected the MAB South region through its
+large peripheral wind field and surge, not through direct over-mooring
+passage. Consequences:
+
+- The **direct** wind-mixing signal at the mooring is modest; the
+  observed mixed layer does not deepen dramatically past the 25 m WFP
+  floor during the storm sub-window.
+- Peak surface cooling occurs ~3 days **after** CPA in both obs and
+  DOPPIO (see `outputs/tables/001-erin-mab-response/event_timing.csv`).
+- This is a **grazing event**, not a direct hit. The primary
+  scientific content of spec 001 is therefore about **shelf-scale
+  post-storm response** rather than the classic eye-passage signature.
+- The spec's original hypothesis (lines 19–24) was implicitly written
+  for a closer pass; it remains a valid framing for spec 002 / future
+  direct-hit analyses, but should not be over-read against the Erin
+  results.
+
+## Original Phase 0 clarifications
+
 - Phase 0 clarifications (resolved unless noted):
   - ~~Which exact MAB South reference designator is the focal mooring?~~
     **Resolved 2026-04-14: `CP13NOPM-WFP01-03-CTDPFK000`.**

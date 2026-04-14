@@ -31,7 +31,7 @@ everything came from.
   to the CP13N mooring position, then index-based slice around that
   `xi_rho`/`eta_rho` with a small buffer; time slice 2025-08-15 to
   2025-08-29.
-- **Retrieval date**: _[to be filled by notebook 01 on first run]_
+- **Retrieval date**: 2026-04-14 (auto-set by notebook 01)
 - **Run version**: `2017_da` operational PSAS (Nov 2017 – present).
 - **Why not reanalysis?**: DOPPIO V3R3 reanalysis ends 2024; does not
   cover Erin.

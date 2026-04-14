@@ -62,7 +62,7 @@ Outputs: three files under `outputs/data/raw/`, and a provenance update
 to `outputs/data/README.md`.
 
 **Event window**: 2025-08-15 → 2025-08-29 UTC. Erin's closest approach
-to the MAB South array was 2025-08-21 12:00 UTC (~378 km SE, Cat 2).""",
+to the MAB South array was 2025-08-21 12:00 UTC (~316 km SE, Cat 2).""",
         with_disclosure=True,
     )
 )
@@ -122,10 +122,10 @@ SBI_REFDES  = 'CP13NOPM-SBI01-02-CTDMOS011'
 SBI_STREAM  = 'recovered_inst-ctdmo_ghqr_instrument_recovered'
 SBI_KDATA   = Path(f'/home/jovyan/ooi/kdata/{SBI_REFDES}-{SBI_STREAM}')
 
-# --- DOPPIO operational 2017_da run, hourly 'Best' aggregation ---
-# [Q: do we want the hourly History_Best or daily Best_Excluding_Day1?
-#     research.md Phase 0.3 says hourly primary; confirming with a quick
-#     look at the operational metadata.]
+# --- DOPPIO operational 2017_da run ---
+# Use the hourly History_Best aggregation (per research.md Phase 0.3).
+# The daily Best_Excluding_Day1 is the documented fallback if hourly is
+# unavailable or too slow over OPeNDAP.
 DOPPIO_URL  = 'https://tds.marine.rutgers.edu/thredds/dodsC/roms/doppio/2017_da/his/History_Best'
 
 # --- NHC TCR for Hurricane Erin (AL052025) ---
@@ -240,11 +240,12 @@ cells.append(
     md(
         """## 4. Download NHC Tropical Cyclone Report and extract best-track (T013)
 
-The 2025 HURDAT2 best-track file has not been released yet, so we use the
-TCR PDF (final, issued 2026-01-30). We download the PDF and attempt to
-parse Table 1 (6-hourly positions) with pdfplumber. If automatic parsing
-is unreliable, fall back to the hardcoded positions block below (extracted
-from TCR Table 1 at the time of this notebook's creation, cited)."""
+HURDAT2 for the 2025 season has not been released yet; the authoritative
+source is the final Tropical Cyclone Report (TCR) for Hurricane Erin
+(AL052025), issued 2026-01-30. We download the TCR PDF and parse Table 1
+(6-hourly best-track positions) directly with pdfplumber. Every row in
+`erin_nhc_besttrack.csv` corresponds to a Table 1 entry verbatim —
+nothing is hand-transcribed or narrative-inferred."""
     )
 )
 cells.append(
@@ -261,108 +262,83 @@ print(f'  saved: {TCR_PDF_OUT}  ({len(resp.content) / 1e6:.2f} MB, sha256[:12]={
 )
 cells.append(
     code(
-        """# Attempt pdfplumber parse of Table 1; if it fails or returns nothing
-# plausible, fall back to the hardcoded positions.
-# [Q: keep the pdfplumber attempt or just use the hardcoded block for a
-#     student-facing reproducibility demo? Current compromise: try the
-#     parse, show what it finds, then hand-verify against the hardcoded block.]
-
+        """# Parse NHC TCR Table 1 directly from the PDF using pdfplumber.
+# This is the authoritative track — every row is a Table 1 entry;
+# NOTHING is narrative-inferred. Forward-fills the 'stage' column
+# where TCR uses " (ditto).
 import pdfplumber
+import re
+from datetime import datetime
 
-rows = []
-try:
-    with pdfplumber.open(TCR_PDF_OUT) as pdf:
-        # Table 1 in NHC TCRs is typically 1-2 pages in; scan the first ~15.
-        for i, page in enumerate(pdf.pages[:15]):
-            text = page.extract_text() or ''
-            if 'BEST TRACK' in text.upper() or 'Date/Time' in text:
-                print(f'Page {i+1} looks like it contains the track table.')
-                # Try extract_tables
-                for t in page.extract_tables():
-                    for r in t:
-                        rows.append(r)
-    print(f'pdfplumber extracted {len(rows)} candidate rows.')
-except Exception as e:
-    print(f'[TODO: handle pdfplumber failure] {e}')
-"""
-    )
+ROW_RE = re.compile(
+    r'\\s*(\\d{1,2})\\s*/\\s*(\\d{4})\\s+([\\d.]+)\\s+([\\d.]+)\\s+(\\d+)\\s+(\\d+)\\s+(.+)$'
 )
-cells.append(
-    code(
-        """# HARDCODED fallback: 6-hourly best-track positions transcribed from
-# NHC TCR AL052025 Table 1 (final report issued 2026-01-30). This lives
-# in the notebook so the download step is reproducible even if the PDF
-# parser breaks; cite the TCR as the source.
-# [C: if a later HURDAT2-2025 release becomes available, switch to that
-#     and remove this block.]
 
-TRACK_SOURCE = 'NHC TCR AL052025_Erin.pdf (final, 2026-01-30), Table 1'
+def saffir_simpson(wind_kt: int) -> str:
+    \"\"\"Map sustained wind speed (kt) to Saffir-Simpson hurricane category.\"\"\"
+    if wind_kt >= 137: return 'HU5'
+    if wind_kt >= 113: return 'HU4'
+    if wind_kt >= 96:  return 'HU3'
+    if wind_kt >= 83:  return 'HU2'
+    return 'HU1'
 
-# Abridged — focus on the 2025-08-18 through 2025-08-29 segment relevant
-# to the MAB South response. Fields: datetime_utc, lat, lon, wind_kt,
-# slp_mb, status.
-# [Q: should we include the full life cycle (Aug 11–28) for the storm-
-#     track map (Figure 1), or just the event window? Currently including
-#     the full life cycle so Figure 1 can show the whole track.]
-_track_text = '''
-datetime_utc,lat,lon,wind_kt,slp_mb,status
-2025-08-11T00:00:00Z,14.4,-22.5,25,1007,TD
-2025-08-11T12:00:00Z,15.0,-25.3,30,1006,TD
-2025-08-12T00:00:00Z,15.6,-28.0,35,1004,TS
-2025-08-12T12:00:00Z,16.1,-30.5,40,1003,TS
-2025-08-13T00:00:00Z,16.4,-33.0,45,1001,TS
-2025-08-13T12:00:00Z,16.6,-35.4,50,999,TS
-2025-08-14T00:00:00Z,16.7,-37.6,55,996,TS
-2025-08-14T12:00:00Z,16.9,-39.7,60,992,TS
-2025-08-15T00:00:00Z,17.2,-41.6,70,986,HU1
-2025-08-15T12:00:00Z,17.7,-43.3,85,978,HU2
-2025-08-16T00:00:00Z,18.5,-45.1,105,955,HU3
-2025-08-16T12:00:00Z,19.2,-46.8,125,930,HU4
-2025-08-16T18:00:00Z,19.8,-47.8,140,913,HU5
-2025-08-17T00:00:00Z,20.4,-48.7,135,918,HU4
-2025-08-17T12:00:00Z,21.6,-50.7,120,935,HU4
-2025-08-18T00:00:00Z,22.8,-52.7,110,946,HU3
-2025-08-18T12:00:00Z,24.0,-54.6,115,944,HU4
-2025-08-19T00:00:00Z,25.3,-56.3,110,947,HU3
-2025-08-19T12:00:00Z,26.7,-57.8,105,949,HU3
-2025-08-20T00:00:00Z,28.2,-59.2,105,948,HU3
-2025-08-20T12:00:00Z,29.8,-61.0,100,952,HU3
-2025-08-21T00:00:00Z,32.3,-64.7,95,953,HU2
-2025-08-21T06:00:00Z,33.5,-67.9,95,950,HU2
-2025-08-21T12:00:00Z,34.9,-71.7,90,949,HU2
-2025-08-21T18:00:00Z,36.7,-75.2,85,953,HU2
-2025-08-22T00:00:00Z,38.5,-78.0,80,958,HU1
-2025-08-22T06:00:00Z,40.2,-79.6,75,964,HU1
-2025-08-22T12:00:00Z,41.8,-80.0,70,968,HU1
-2025-08-22T18:00:00Z,43.4,-79.2,65,975,EX
-2025-08-23T00:00:00Z,44.8,-77.4,60,980,EX
-2025-08-23T12:00:00Z,47.2,-71.8,55,985,EX
-2025-08-24T00:00:00Z,49.5,-64.0,50,988,EX
-2025-08-24T12:00:00Z,52.0,-55.0,45,992,EX
-2025-08-25T00:00:00Z,54.8,-46.0,40,996,EX
-2025-08-25T12:00:00Z,57.0,-37.5,40,998,EX
-2025-08-26T00:00:00Z,58.8,-29.0,35,1001,EX
-2025-08-27T00:00:00Z,61.0,-15.0,30,1004,EX
-2025-08-28T00:00:00Z,62.5,-2.0,25,1008,EX
-'''.strip()
+def parse_tcr_table1(pdf_path):
+    \"\"\"Parse Table 1 (best track) from the NHC TCR PDF.
 
-# NOTE: These values are transcribed from the TCR. Fine-scale details
-# (6-hourly intensity/position in the CPA window) were inferred from the
-# TCR synoptic-history narrative; spot-check against TCR Table 1 before
-# citing in a publication.
-# [Q: should we add a note cell flagging this explicitly for students?]
+    Page range 8-10 is specific to AL052025_Erin_TCR.pdf; confirmed by
+    probing page contents. Every row below comes from Table 1 verbatim.
+    \"\"\"
+    rows = []
+    current_stage = 'tropical depression'
+    with pdfplumber.open(pdf_path) as pdf:
+        for page_idx in (7, 8, 9):  # pages 8-10
+            text = pdf.pages[page_idx].extract_text() or ''
+            for line in text.split('\\n'):
+                m = ROW_RE.match(line)
+                if not m:
+                    continue
+                day, hhmm, lat_s, lon_s, pres_s, wind_s, stage_s = m.groups()
+                lat  = float(lat_s)
+                lon  = -float(lon_s)       # TCR uses °W — flip sign
+                pres = int(pres_s)
+                wind = int(wind_s)
+                stage_s = stage_s.strip().strip('"').strip()
+                if stage_s:
+                    current_stage = stage_s
+                dt = datetime(2025, 8, int(day), int(hhmm[:2]), int(hhmm[2:]))
+                stage_lower = current_stage.lower()
+                if 'extratropical' in stage_lower:
+                    status = 'EX'
+                elif 'hurricane' in stage_lower:
+                    status = saffir_simpson(wind)
+                elif 'tropical storm' in stage_lower:
+                    status = 'TS'
+                elif 'tropical depression' in stage_lower:
+                    status = 'TD'
+                else:
+                    status = 'UNK'
+                rows.append({
+                    'datetime_utc': dt.isoformat() + 'Z',
+                    'lat':     lat,
+                    'lon':     lon,
+                    'wind_kt': wind,
+                    'slp_mb':  pres,
+                    'stage':   current_stage,
+                    'status':  status,
+                    'source':  'NHC TCR AL052025_Erin.pdf Table 1 (parsed via pdfplumber)',
+                })
+    return pd.DataFrame(rows)
 
-from io import StringIO
-track = pd.read_csv(StringIO(_track_text), parse_dates=['datetime_utc'])
-track['source'] = TRACK_SOURCE
+track = parse_tcr_table1(TCR_PDF_OUT)
+track['datetime_utc'] = pd.to_datetime(track['datetime_utc'])
 
 track.to_csv(TRACK_OUT, index=False)
-print(f'Wrote: {TRACK_OUT}  ({len(track)} positions)')
-print(f'Track time range: {track["datetime_utc"].min()} → {track["datetime_utc"].max()}')
+print(f'Wrote: {TRACK_OUT}  ({len(track)} positions parsed from TCR Table 1)')
+print(f'Track time range: {track.datetime_utc.min()} → {track.datetime_utc.max()}')
 print()
 print('CPA window (2025-08-20 through 2025-08-22):')
 cpa_window = track[(track['datetime_utc'] >= '2025-08-20') & (track['datetime_utc'] <= '2025-08-22T18:00')]
-print(cpa_window.to_string(index=False))
+print(cpa_window[['datetime_utc', 'lat', 'lon', 'wind_kt', 'slp_mb', 'status']].to_string(index=False))
 """
     )
 )
@@ -430,8 +406,8 @@ cells.append(
     code(
         """# Time slice + spatial slice + variable selection
 keep_vars = ['temp', 'salt', 'Cs_r', 'hc', 'h', 'zeta', 'lon_rho', 'lat_rho', 's_rho']
-# [Q: do we need 'angle' (grid rotation) for later velocity work? Not
-#     needed for spec 001 (T/S only); excluded for now.]
+# (`angle`, the grid rotation, is not needed for T/S comparison; if a
+# future spec adds velocity, include `angle`, `u`, `v`, `ubar`, `vbar`.)
 
 doppio_slice = (
     doppio[keep_vars]
@@ -475,7 +451,23 @@ error, and cover the expected window."""
 )
 cells.append(
     code(
-        """# QC summary: all three files open cleanly and cover the event window
+        """# Patch the outputs/data/README.md retrieval-date line so provenance
+# tracks the actual notebook run.
+DATA_README = Path('../outputs/data/README.md')
+if DATA_README.exists():
+    txt = DATA_README.read_text()
+    patched = False
+    for old in [
+        '- **Retrieval date**: _[to be filled by notebook 01 on first run]_',
+    ]:
+        if old in txt:
+            txt = txt.replace(old, f'- **Retrieval date**: {RETRIEVAL_DATE} (auto-set by notebook 01)')
+            patched = True
+    if patched:
+        DATA_README.write_text(txt)
+        print(f'Patched retrieval date in {DATA_README}')
+
+# QC summary: all three files open cleanly and cover the event window
 import os
 
 summary = []

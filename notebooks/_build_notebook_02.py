@@ -361,11 +361,12 @@ standard):
 For the comparison, we need depth in positive-down meters to match
 the obs convention. The notebook below reports `z_pos_down = -z`.
 
-> `[Q: Vtransform=2 assumed for DOPPIO 2017_da. If Rutgers updates
->     to Vtransform=1 in the future, the formula needs swapping.
->     Sanity check at the end of this section: z at s_rho=0 (deepest)
->     should equal roughly -h (bottom), and z at s_rho=-1 (shallowest)
->     should be near zeta (surface).]`"""
+Vtransform=2 is the DOPPIO 2017_da standard. The sanity check at the
+end of this section verifies the conversion: `z` at the surface-most
+sigma level (k=-1) should be ≈ `zeta` (surface), and at the deepest
+sigma level (k=0) should be ≈ `-h` (bottom). If Rutgers ever changes
+to Vtransform=1 the formula needs swapping — the sanity check will
+fail loudly."""
     )
 )
 cells.append(

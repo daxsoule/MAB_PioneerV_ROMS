@@ -129,8 +129,8 @@ cells.append(
 
 **What this figure shows**: Erin's 6-hourly best-track positions from
 NHC (AL052025), colored by storm intensity category. The CP13NOPM
-mooring at ~37.1°N, 75.1°W is marked. Erin's closest approach on
-2025-08-21 12:00 UTC passed ~378 km SE of the array as a Cat-2
+mooring at ~36.17°N, 74.83°W is marked. Erin's closest approach on
+2025-08-21 12:00 UTC passed ~316 km SE of the array as a Cat-2
 hurricane (90 kt, 949 mb).
 
 **Why it matters**: The mooring was never in the eye, but the storm
@@ -248,7 +248,7 @@ fig1.update_yaxes(
 fig1.update_layout(
     title=dict(
         text='<b>Figure 1</b> — Hurricane Erin (AL052025) NHC best track<br>'
-             '<sub>Closest approach ~380 km SE of CP13NOPM on 2025-08-21 12:00 UTC (Cat 2)</sub>',
+             '<sub>Closest approach ~316 km SE of CP13NOPM on 2025-08-21 12:00 UTC (Cat 2)</sub>',
         x=0.5, xanchor='center',
     ),
     height=700, width=1000,
@@ -268,14 +268,16 @@ cells.append(
     md(
         """## 4. Figure 2 — Observation T(z, t) Hovmöller (T033)
 
-WFP profiler T at CP13NOPM on the 2 m × hourly grid. The closest-
-approach time is marked (dashed black line).
-
-**What to look for**: bottom-layer temperature should be roughly
-stable around 12–14 °C during the quiescent pre-storm days, with
-upper warm water sitting above 50 m. During Erin's passage, wind-
-driven mixing should cool the upper layer and deepen the thermocline
-— look for a visible tongue of cool water reaching upward."""
+WFP profiler T at CP13NOPM on the 2 m × hourly grid, after QARTOD
+filtering (accepting flag 1 = pass and flag 2 = not evaluated) and a
+range check against the constitution's MAB bounds (T: 2–28 °C,
+S: 28–37 PSU). Each plotted cell is the hourly mean of accepted
+samples at that depth bin; white cells within the 25–79 m band are
+hours without a profile pass through that depth, not filtered data.
+The top strip shows near-surface T from the separate SBI cable CTD
+at nominal ~0.5 m — plotted for context, not included in the
+Hovmöller grid (see Step 9 caveat in methods doc). The closest-
+approach time is marked (dashed black line)."""
     )
 )
 cells.append(

@@ -1,8 +1,8 @@
 item,value,stream,path
-obs_WFP_refdes,CP13NOPM-WFP01-03-CTDPFK000,recovered_wfp,../outputs/data/raw/CP13NOPM-WFP01-03-CTDPFK000_erin.nc
-obs_SBI_refdes,CP13NOPM-SBI01-02-CTDMOS011,recovered_inst,../outputs/data/raw/CP13NOPM-SBI01-02-CTDMOS011_erin.nc
-doppio_url,https://tds.marine.rutgers.edu/thredds/dodsC/roms/doppio/2017_da/his/History_Best,operational 2017_da,../outputs/data/raw/doppio_CP13N_erin.nc
-nhc_tcr_url,https://www.nhc.noaa.gov/data/tcr/AL052025_Erin.pdf,best track (Table 1),../outputs/data/raw/erin_nhc_besttrack.csv
+obs_WFP_refdes,CP13NOPM-WFP01-03-CTDPFK000,recovered_wfp,outputs/data/raw/CP13NOPM-WFP01-03-CTDPFK000_erin.nc
+obs_SBI_refdes,CP13NOPM-SBI01-02-CTDMOS011,recovered_inst,outputs/data/raw/CP13NOPM-SBI01-02-CTDMOS011_erin.nc
+doppio_url,https://tds.marine.rutgers.edu/thredds/dodsC/roms/doppio/2017_da/his/History_Best,operational 2017_da,outputs/data/raw/doppio_CP13N_erin.nc
+nhc_tcr_url,https://www.nhc.noaa.gov/data/tcr/AL052025_Erin.pdf,best track (Table 1 parsed via pdfplumber),outputs/data/raw/erin_nhc_besttrack.csv
 event_window,2025-08-15 to 2025-08-29 UTC,,
 cpa,2025-08-21 12:00 UTC,,
 MLD_criterion_primary,Δσθ=0.03 kg/m³,ref_depth=25.0 m,de Boyer Montégut 2004

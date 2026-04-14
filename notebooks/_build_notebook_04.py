@@ -77,6 +77,14 @@ cells.append(
     'pyarrow>=15.0' \\
     'plotly>=5.20' \\
     'gsw>=3.6'
+# Ensure the project `src/` is on the path so the notebook can import
+# the pytest-covered helpers (mld_threshold, sigma_to_z_vtransform2,
+# paired_stats). In Colab, set SRC_PATH to wherever `src/` is cloned.
+import sys
+from pathlib import Path
+SRC_PATH = Path('..').resolve()   # project root (one level above notebooks/)
+if str(SRC_PATH) not in sys.path:
+    sys.path.insert(0, str(SRC_PATH))
 """
     )
 )
@@ -93,6 +101,10 @@ import gsw
 import plotly.graph_objects as go
 import xarray as xr
 from plotly.subplots import make_subplots
+
+# pytest-covered helpers (see src/*.py, tests/test_*.py)
+from src.mld import mld_threshold
+from src.paired_stats import paired_stats
 
 PROC_DIR = Path('../outputs/data/processed')
 RAW_DIR  = Path('../outputs/data/raw')
@@ -183,55 +195,15 @@ if the mixed layer is shallower than the 25 m reference, the returned
 )
 cells.append(
     code(
-        """def mld_threshold(df_prof, var, thresh, ref_depth=REF_DEPTH):
-    \"\"\"Compute MLD from a depth-sorted profile via a fixed threshold.
-
-    Returns (mld_m, code) where code is:
-      'ok'     : threshold found within profile, MLD is reliable
-      'atmin'  : |var - ref| >= thresh at ref_depth already
-                 (mixed layer < ref_depth; MLD is a lower bound)
-      'nocrit' : threshold never reached in profile (MLD > deepest obs)
-    \"\"\"
-    prof = df_prof.dropna(subset=[var]).sort_values('depth').reset_index(drop=True)
-    if len(prof) < 3:
-        return np.nan, 'nodata'
-    # Reference value: interpolate the variable at ref_depth
-    if ref_depth < prof['depth'].iloc[0]:
-        # reference depth is shallower than shallowest measurement
-        ref_val = prof[var].iloc[0]
-    else:
-        ref_val = np.interp(ref_depth, prof['depth'].values, prof[var].values)
-    diffs = np.abs(prof[var].values - ref_val)
-    # Walk downward from the first sample at/below ref
-    below_ref = prof[prof['depth'] >= ref_depth].reset_index(drop=True)
-    if below_ref.empty:
-        return np.nan, 'nodata'
-    # Check the reference depth itself
-    if below_ref[var].iloc[0] is None or np.isnan(below_ref[var].iloc[0]):
-        return np.nan, 'nodata'
-    # find the first index where |diff| >= thresh
-    diff_below = np.abs(below_ref[var].values - ref_val)
-    idx = np.where(diff_below >= thresh)[0]
-    if len(idx) == 0:
-        return np.nan, 'nocrit'
-    k = idx[0]
-    if k == 0:
-        # already exceeded threshold at ref_depth — MLD is a lower bound
-        return float(below_ref['depth'].iloc[0]), 'atmin'
-    # linear interpolation between k-1 and k
-    z1, z2 = below_ref['depth'].iloc[k-1], below_ref['depth'].iloc[k]
-    d1, d2 = diff_below[k-1], diff_below[k]
-    if d2 == d1:
-        return float(z2), 'ok'
-    mld = z1 + (thresh - d1) * (z2 - z1) / (d2 - d1)
-    return float(mld), 'ok'
-
+        """# mld_threshold is imported from src.mld (pytest-covered).
+# Wrapper to compute an hourly-indexed DataFrame of MLD values for both
+# criteria.
 
 def compute_mld_series(df, label):
     rows = []
     for t, group in df.groupby('time'):
-        m_sig, c_sig = mld_threshold(group, 'sigma_theta', DSIG_THRESH)
-        m_T,   c_T   = mld_threshold(group, 'T', DT_THRESH)
+        m_sig, c_sig = mld_threshold(group, 'sigma_theta', DSIG_THRESH, REF_DEPTH)
+        m_T,   c_T   = mld_threshold(group, 'T', DT_THRESH, REF_DEPTH)
         rows.append({
             'time':       t,
             'mld_sigma':  m_sig, 'code_sigma': c_sig,
@@ -366,8 +338,10 @@ fig5.update_xaxes(title='Time (UTC)')
 fig5.update_layout(
     title=dict(
         text='<b>Figure 5</b> — Mixed-layer depth vs. time, obs vs. DOPPIO, two criteria<br>'
-             '<sub>Reference depth 25 m (constrained by WFP coverage). Solid: Δσθ=0.03 kg/m³ '
-             '(de Boyer Montégut 2004). Dotted: ΔT=0.2°C sensitivity check. Black dashed: CPA.</sub>',
+             '<sub>Δσθ=0.03 kg/m³ threshold from a 25 m reference depth (NON-STANDARD: '
+             'de Boyer Montégut 2004 uses 10 m; 25 m forced by the WFP\\\'s shallowest '
+             'sampling depth). Applied identically to both products. Dotted: ΔT=0.2°C sensitivity. '
+             'Gray dotted: reference depth. Black dashed: CPA.</sub>',
         x=0.5, xanchor='center',
     ),
     height=520, width=1100,
@@ -452,40 +426,67 @@ Paired on common hourly timestamps within each sub-window."""
 )
 cells.append(
     code(
-        """def paired_stats(obs_df, mod_df, var, t0, t1, label_var, label_window):
-    obs = obs_df[['time', var]].rename(columns={var: 'obs'}).copy()
-    mod = mod_df[['time', var]].rename(columns={var: 'mod'}).copy()
-    obs['time'] = obs['time'].dt.floor('h')
-    mod['time'] = mod['time'].dt.floor('h')
-    merged = obs.merge(mod, on='time', how='inner')
-    merged = merged[(merged['time'] >= t0) & (merged['time'] < t1)].dropna(subset=['obs', 'mod'])
-    n = len(merged)
-    if n < 2:
-        return {'variable': label_var, 'subwindow': label_window, 'N': n,
-                'bias': np.nan, 'rmse': np.nan, 'r': np.nan}
-    diff = merged['mod'] - merged['obs']
-    return {
-        'variable':  label_var,
-        'subwindow': label_window,
-        'N':         n,
-        'bias':      float(diff.mean()),
-        'rmse':      float(np.sqrt((diff ** 2).mean())),
-        'r':         float(np.corrcoef(merged['obs'], merged['mod'])[0, 1]),
-    }
+        """# paired_stats is imported from src.paired_stats (pytest-covered).
 
-# MLD comparison: use mld_sigma (density criterion, primary)
-mld_wfp_ren    = mld_wfp.rename(columns={'mld_sigma': 'MLD'})[['time', 'MLD']]
-mld_doppio_ren = mld_doppio.rename(columns={'mld_sigma': 'MLD'})[['time', 'MLD']]
+# MLD comparison: primary criterion is density (sigma_theta).
+# For a scientifically honest comparison, restrict MLD pairs to rows
+# where BOTH obs and DOPPIO returned code='ok' (threshold cleanly
+# reached) — dropping 'atmin', 'nocrit', and 'nodata' rows where the
+# reported MLD is a lower/upper bound. Record counts so readers can
+# judge representativeness.
 
+def mld_paired_frame(mld_df, label):
+    out = mld_df[['time', 'mld_sigma', 'code_sigma']].copy()
+    out = out.rename(columns={'mld_sigma': 'MLD', 'code_sigma': 'code'})
+    return out
+
+mld_wfp_p    = mld_paired_frame(mld_wfp, 'wfp')
+mld_doppio_p = mld_paired_frame(mld_doppio, 'doppio')
+# Restrict to rows where both are 'ok'
+mld_paired = mld_wfp_p.merge(mld_doppio_p, on='time', suffixes=('_obs', '_mod'))
+ok_mask = (mld_paired['code_obs'] == 'ok') & (mld_paired['code_mod'] == 'ok')
+mld_paired_ok = mld_paired[ok_mask].rename(columns={'MLD_obs': 'obs', 'MLD_mod': 'mod'})
+print('MLD pair status counts across the full event window:')
+print(mld_paired[['code_obs', 'code_mod']].apply(pd.Series.value_counts).fillna(0).astype(int))
+print(f'Pairs where BOTH code==ok: {int(ok_mask.sum())} of {len(mld_paired)}')
+
+# Per-sub-window stats: surface T, surface S, and MLD (both criteria)
 stats_rows = []
 for (t0, t1, label) in [
     (PRE_START, PRE_END, 'pre-storm'),
     (STORM_START, STORM_END, 'storm'),
     (REC_START, REC_END, 'recovery'),
 ]:
-    stats_rows.append(paired_stats(sbi_surface, dp_surface, 'T', t0, t1, 'surface_T', label))
-    stats_rows.append(paired_stats(sbi_surface, dp_surface, 'S', t0, t1, 'surface_S', label))
-    stats_rows.append(paired_stats(mld_wfp_ren, mld_doppio_ren, 'MLD', t0, t1, 'MLD_sigma', label))
+    s_T = paired_stats(sbi_surface, dp_surface, 'T', t0, t1, 'surface_T', label)
+    s_T['reference_depth_m'] = 0.5
+    s_T['notes'] = 'SBI vs DOPPIO at ~0.5 m'
+    stats_rows.append(s_T)
+
+    s_S = paired_stats(sbi_surface, dp_surface, 'S', t0, t1, 'surface_S', label)
+    s_S['reference_depth_m'] = 0.5
+    s_S['notes'] = 'SBI vs DOPPIO at ~0.5 m'
+    stats_rows.append(s_S)
+
+    # MLD, all rows (all codes included)
+    mld_all_obs = mld_paired[['time', 'MLD_obs']].rename(columns={'MLD_obs': 'MLD'})
+    mld_all_mod = mld_paired[['time', 'MLD_mod']].rename(columns={'MLD_mod': 'MLD'})
+    s_mld_all = paired_stats(mld_all_obs, mld_all_mod, 'MLD', t0, t1, 'MLD_sigma_all', label)
+    s_mld_all['reference_depth_m'] = float(REF_DEPTH)
+    n_obs_atmin = int((mld_paired[(mld_paired['time'] >= t0) & (mld_paired['time'] < t1)]['code_obs'] == 'atmin').sum())
+    n_mod_atmin = int((mld_paired[(mld_paired['time'] >= t0) & (mld_paired['time'] < t1)]['code_mod'] == 'atmin').sum())
+    n_obs_nocrit = int((mld_paired[(mld_paired['time'] >= t0) & (mld_paired['time'] < t1)]['code_obs'] == 'nocrit').sum())
+    n_mod_nocrit = int((mld_paired[(mld_paired['time'] >= t0) & (mld_paired['time'] < t1)]['code_mod'] == 'nocrit').sum())
+    s_mld_all['notes'] = (f'all codes; obs_atmin={n_obs_atmin}, mod_atmin={n_mod_atmin}, '
+                          f'obs_nocrit={n_obs_nocrit}, mod_nocrit={n_mod_nocrit}')
+    stats_rows.append(s_mld_all)
+
+    # MLD, ok-only (both codes)
+    mld_ok_obs = mld_paired_ok[['time', 'obs']].rename(columns={'obs': 'MLD'})
+    mld_ok_mod = mld_paired_ok[['time', 'mod']].rename(columns={'mod': 'MLD'})
+    s_mld_ok = paired_stats(mld_ok_obs, mld_ok_mod, 'MLD', t0, t1, 'MLD_sigma_ok_only', label)
+    s_mld_ok['reference_depth_m'] = float(REF_DEPTH)
+    s_mld_ok['notes'] = 'restricted to code==ok on both sides'
+    stats_rows.append(s_mld_ok)
 
 stats = pd.DataFrame(stats_rows)
 stats_round = stats.copy()
@@ -494,8 +495,7 @@ for col in ('bias', 'rmse', 'r'):
 
 STATS_OUT = TBL_DIR / 'comparison_stats.csv'
 stats_round.to_csv(STATS_OUT, index=False)
-print(f'Wrote: {STATS_OUT}')
-print()
+print(f'\\nWrote: {STATS_OUT}')
 print(stats_round.to_string(index=False))
 """
     )
@@ -505,15 +505,19 @@ print(stats_round.to_string(index=False))
 cells.append(md("## 9. Table 2 — Data provenance (T047)"))
 cells.append(
     code(
-        """prov = pd.DataFrame([
+        """# Repo-relative paths (not notebook-relative).
+def repo_path(fname):
+    return f'outputs/data/raw/{fname}'
+
+prov = pd.DataFrame([
     dict(item='obs_WFP_refdes', value='CP13NOPM-WFP01-03-CTDPFK000',
-         stream='recovered_wfp', path=str(RAW_DIR / 'CP13NOPM-WFP01-03-CTDPFK000_erin.nc')),
+         stream='recovered_wfp', path=repo_path('CP13NOPM-WFP01-03-CTDPFK000_erin.nc')),
     dict(item='obs_SBI_refdes', value='CP13NOPM-SBI01-02-CTDMOS011',
-         stream='recovered_inst', path=str(RAW_DIR / 'CP13NOPM-SBI01-02-CTDMOS011_erin.nc')),
+         stream='recovered_inst', path=repo_path('CP13NOPM-SBI01-02-CTDMOS011_erin.nc')),
     dict(item='doppio_url', value='https://tds.marine.rutgers.edu/thredds/dodsC/roms/doppio/2017_da/his/History_Best',
-         stream='operational 2017_da', path=str(RAW_DIR / 'doppio_CP13N_erin.nc')),
+         stream='operational 2017_da', path=repo_path('doppio_CP13N_erin.nc')),
     dict(item='nhc_tcr_url', value='https://www.nhc.noaa.gov/data/tcr/AL052025_Erin.pdf',
-         stream='best track (Table 1)', path=str(RAW_DIR / 'erin_nhc_besttrack.csv')),
+         stream='best track (Table 1 parsed via pdfplumber)', path=repo_path('erin_nhc_besttrack.csv')),
     dict(item='event_window', value='2025-08-15 to 2025-08-29 UTC', stream='', path=''),
     dict(item='cpa', value='2025-08-21 12:00 UTC', stream='', path=''),
     dict(item='MLD_criterion_primary', value=f'Δσθ={DSIG_THRESH} kg/m³',
@@ -536,18 +540,35 @@ prov
 cells.append(md("## 10. QC checks (T048–T050)"))
 cells.append(
     code(
-        """# T048 — Peak surface cooling should align (±few hours) with CPA
-sbi_T = sbi_surface.dropna(subset=['T']).copy()
-window = (sbi_T['time'] >= pd.Timestamp('2025-08-18')) & (sbi_T['time'] <= pd.Timestamp('2025-08-25'))
-local_min_t = sbi_T.loc[window].sort_values('T').iloc[0]['time']
-print(f'Obs SBI peak cooling time: {local_min_t}')
-print(f'  offset from CPA (2025-08-21 12 UTC): {(local_min_t - CPA_TIME).total_seconds() / 3600:+.1f} hours')
+        """# T048 — Peak surface cooling timing relative to CPA.
+# Recorded to a tracked CSV so the finding in the methods doc is
+# reproducible from an artifact, not just from re-running the notebook.
 
-dp_T = dp_surface.dropna(subset=['T']).copy()
-window_d = (dp_T['time'] >= pd.Timestamp('2025-08-18')) & (dp_T['time'] <= pd.Timestamp('2025-08-25'))
-local_min_d = dp_T.loc[window_d].sort_values('T').iloc[0]['time']
-print(f'DOPPIO peak cooling time:  {local_min_d}')
-print(f'  offset from CPA: {(local_min_d - CPA_TIME).total_seconds() / 3600:+.1f} hours')
+TIMING_START = pd.Timestamp('2025-08-18')
+TIMING_END   = pd.Timestamp('2025-08-25')
+
+def peak_cooling_offset(ts_df, label):
+    sub = ts_df.dropna(subset=['T']).copy()
+    sub = sub[(sub['time'] >= TIMING_START) & (sub['time'] <= TIMING_END)]
+    row = sub.sort_values('T').iloc[0]
+    t_min = row['time']
+    offset_h = (t_min - CPA_TIME).total_seconds() / 3600
+    return {
+        'source':          label,
+        'peak_cooling_t':  t_min,
+        'T_at_min_C':      float(row['T']),
+        'offset_hours_from_CPA': round(offset_h, 1),
+        'search_window':   f'{TIMING_START.date()} to {TIMING_END.date()}',
+    }
+
+event_timing = pd.DataFrame([
+    peak_cooling_offset(sbi_surface, 'SBI obs (~0.5 m)'),
+    peak_cooling_offset(dp_surface,  'DOPPIO (~0.5 m)'),
+])
+TIMING_OUT = TBL_DIR / 'event_timing.csv'
+event_timing.to_csv(TIMING_OUT, index=False)
+print(f'Wrote: {TIMING_OUT}')
+print(event_timing.to_string(index=False))
 """
     )
 )
