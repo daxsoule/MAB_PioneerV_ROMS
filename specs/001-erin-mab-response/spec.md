@@ -28,9 +28,11 @@ tuned to climatology rather than to individual storms.
 ### Primary Data — Observations
 
 - **Source**: OOI Coastal Pioneer MAB South (Coastal Virginia) Array,
-  one focal profiler mooring (specific reference designator TBD —
-  array is new as of 2024, asset catalog must be confirmed from the
-  OOI Data Explorer for the Erin window).
+  focal profiler mooring **`CP13NOPM-WFP01-03-CTDPFK000`** — a
+  wire-following profiler CTD on site CP13N of the MAB South array.
+  (Full site-code decoding — nominal depth range, position, and
+  intended deployment cadence — to be confirmed from the OOI asset
+  catalog at the download step.)
 - **Coverage**: ~2 weeks bracketing Hurricane Erin's closest approach
   to the array in 2025 (pre-storm baseline, storm passage, recovery).
 - **Format**: NetCDF from OOI Data Explorer / M2M API; recovered-
@@ -170,8 +172,9 @@ audience and keeps the first spec simple.
 
 ## Completion Criteria
 
-- [ ] Focal mooring reference designator identified and deployment
-      confirmed to cover Erin's passage.
+- [x] Focal mooring reference designator identified: `CP13NOPM-WFP01-03-CTDPFK000`.
+- [ ] Deployment covering Erin's passage confirmed; depth coverage
+      audited (needs surface to at least ~50 m for a mixed-layer analysis).
 - [ ] DOPPIO dataset URL and time slice identified and downloaded.
 - [ ] Erin NHC best-track downloaded and event sub-windows defined.
 - [ ] All four notebooks run end-to-end from raw downloads to figures.
@@ -219,7 +222,8 @@ audience and keeps the first spec simple.
   acknowledged.
 - Open clarifications that do **not** block spec approval but will
   need resolution before the plan stage:
-  - Which exact MAB South reference designator is the focal mooring?
+  - ~~Which exact MAB South reference designator is the focal mooring?~~
+    **Resolved 2026-04-14: `CP13NOPM-WFP01-03-CTDPFK000`.**
   - Does the deployment spanning Erin have adequate depth coverage
     for a mixed-layer analysis (needs surface to at least ~50 m)?
   - DOPPIO dataset version/URL for the Erin window — pin at retrieval.
