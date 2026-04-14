@@ -4,14 +4,20 @@
 
 This project compares observations from the OOI Pioneer MAB South
 (Coastal Virginia) Array with regional ocean model output (e.g.,
-DOPPIO / ESPreSSO / NYB-ROMS). The goal is to evaluate how well
-existing ROMS simulations reproduce the Coastal Virginia shelf regime
-and where observation–model mismatches point to gaps in forcing,
-physics, or sampling.
+DOPPIO / ESPreSSO / NYB-ROMS) during a **known hurricane event** that
+passed over the array. The goal is to evaluate how both the moored
+observations and the ROMS simulation capture the event — its timing,
+magnitude, vertical structure, and recovery — and to identify where
+model and observations diverge.
 
-The active scientific question (specific variables, time windows,
-metrics) lives in the project spec. This constitution governs the
-standards that apply regardless of the specific question framing.
+Event-scale comparison (rather than seasonal-climatology comparison)
+is the primary framing: hurricane passage is a well-defined forcing
+that stresses both the observing array and the model, so mismatches
+are diagnostic rather than statistical.
+
+The specific hurricane, time window, and metrics live in the project
+spec. This constitution governs the standards that apply regardless
+of the specific question framing.
 
 ## Core Principles
 
@@ -89,16 +95,26 @@ boundaries explicit in abstracts, captions, and READMEs.
   instruments.
 - **Documentation**: https://oceanobservatories.org/array/coastal-pioneer-mab/
 
-### Regional ROMS products
+### DOPPIO (Rutgers MAB/GoM ROMS) — primary model
 
-- **DOPPIO** (Rutgers, MAB/GoM): https://tds.marine.rutgers.edu/
-- **ESPreSSO / NYB-ROMS** and successors as they appear.
-- **Access**: THREDDS/OPeNDAP where public; document the exact dataset
-  URL, version, and retrieval date in `outputs/data/README.md` and in
-  any downloader script.
-- **Known issues**: Spin-up periods, open-boundary artifacts near the
+- **Description**: Rutgers Ocean Modeling Group's data-assimilative
+  ROMS simulation covering the Mid-Atlantic Bight and Gulf of Maine.
+  The authoritative regional ROMS product for this project.
+- **Access**: THREDDS/OPeNDAP at https://tds.marine.rutgers.edu/
+  (document the exact dataset URL, version, and retrieval date in
+  `outputs/data/README.md` and in any downloader script).
+- **Known issues**: Spin-up periods, open-boundary artifacts near
   domain edges, vertical sigma coordinate must be converted to z for
-  comparison, land mask vs. wet-cell mismatches.
+  comparison, land mask vs. wet-cell mismatches, assimilation
+  increments can produce timing-specific features.
+
+### Secondary ROMS products (for cross-check only)
+
+- **ESPreSSO** — older MAB ROMS; useful for a second-opinion check
+  but not the anchor.
+- **NYB-ROMS** — smaller New York Bight domain; include only if a
+  given version covers the Pioneer MAB South footprint.
+- Do not swap the primary-vs-secondary role without updating the spec.
 
 ## Technical Environment
 
@@ -111,6 +127,13 @@ boundaries explicit in abstracts, captions, and READMEs.
   ceiling for parallel jobs per user's global rule).
 - **Version control**: Git. Raw data stays outside the repo; processed
   slices in `outputs/data/` (large files gitignored).
+- **Self-contained notebooks**: Every notebook declares and installs
+  its own dependencies in the first code cell (e.g., `%pip install
+  xarray netCDF4 matplotlib plotly` or equivalent) so it runs
+  standalone in a fresh Jupyter / Colab environment without relying
+  on the project's `uv` venv. Pin versions in the install cell. The
+  project `pyproject.toml` remains the authoritative environment for
+  scripts and tests, but notebooks must not assume it.
 
 ## Coordinate Systems & Units
 
@@ -125,24 +148,42 @@ boundaries explicit in abstracts, captions, and READMEs.
 
 ## Figure Standards
 
-- **Exploratory / notebook figures**: Plotly (interactive, hover, zoom).
-- **Publication figures**: Matplotlib, 300 dpi PNG or PDF vector.
-- **Colormaps**: Colorblind-safe (`viridis`, `cividis`, `cmocean.thermal`,
-  Okabe-Ito for categorical).
+Primary audience is **students** working through the notebooks as a
+teaching demo, so figures default to interactive and exploratory.
+
+- **Default (student-facing notebooks)**: Plotly — interactive, hover
+  for values, zoom/pan. Every figure should invite exploration.
+- **Optional publication export**: If a figure is promoted to a paper
+  or static deliverable, re-render in matplotlib at 300 dpi PNG or
+  PDF vector.
+- **Colormaps**: Colorblind-safe (`viridis`, `cividis`,
+  `cmocean.thermal`, Okabe-Ito for categorical).
 - **Comparison plots**: Always label which product is which; use
   consistent color assignments across figures (e.g., observations in
-  black, model in a sequential color).
+  black, DOPPIO in a sequential color).
 - **Rubrics**: Score every figure against `timeseries-figure` or
-  `map-figure` rubric before committing. Paper tier by default.
+  `map-figure` rubric before committing. Student-lab tier: clarity
+  and pedagogy first; paper tier only when exporting a final figure.
+- **Captions**: Write for a student reader — say what the figure
+  shows and why it matters, not just the axes.
 
 ## Quality Checks
 
 - **Observations**:
   - QARTOD flags: accept only flag=1 (pass) or 2 (not evaluated).
-  - Range checks (MAB shelf/slope bounds):
+  - Range checks (typical MAB shelf/slope bounds):
     - Temperature: 2–28 °C
     - Salinity: 28–37 PSU
     - Pressure: 0–500 dbar
+  - **Hurricane-event excursions**: The bounds above are intentionally
+    set for typical conditions. Real storm effects (rapid surface
+    cooling from mixing, freshening from rain/runoff, surge at the
+    surface mooring) can legitimately push values outside these
+    bounds. Flagged excursions during the event window must be
+    **reviewed case-by-case**, not silently accepted or rejected.
+    This is a teaching feature: students see the QC system fire and
+    investigate whether the flag reflects an instrument problem or
+    a real oceanographic signal.
 - **Model**:
   - Respect the land/wet mask; do not compare at masked cells.
   - Exclude documented spin-up window and open-boundary buffer cells.
@@ -176,7 +217,12 @@ filenames, and short inline labels are exempt.
 ## Project Notes
 
 - **Repository visibility**: Public GitHub repo (`daxsoule/MAB_PioneerV_ROMS`).
-- **Audience**: Likely to include collaborators and students; keep
-  READMEs and notebooks approachable and cite all data sources.
+- **Primary audience**: Students using the notebooks as a teaching
+  demo. READMEs, notebook prose, captions, and choice of
+  exploratory vs. static figures should all serve that audience
+  first. Research outputs (figures, tables) can be promoted later if
+  the work becomes publication-ready.
 - **Status**: New project as of 2026-04-14. No publication timeline or
   embargo yet.
+- **Focal event**: A 2025 hurricane passage over the Pioneer MAB South
+  array. Storm name, track, and exact event window TBD in the spec.
