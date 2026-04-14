@@ -1,0 +1,10 @@
+variable,subwindow,N,bias,rmse,r
+surface_T,pre-storm,120,-0.332,0.511,0.729
+surface_S,pre-storm,120,-0.857,0.906,-0.27
+MLD_sigma,pre-storm,40,-3.448,4.125,0.07
+surface_T,storm,48,-0.028,0.494,0.737
+surface_S,storm,48,-0.205,0.313,0.463
+MLD_sigma,storm,16,-2.546,3.244,0.076
+surface_T,recovery,168,0.284,0.791,0.5
+surface_S,recovery,168,0.292,0.462,0.126
+MLD_sigma,recovery,48,-2.444,3.201,0.416

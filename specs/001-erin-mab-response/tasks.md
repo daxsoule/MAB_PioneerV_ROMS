@@ -101,19 +101,19 @@ All three original open questions are resolved (see `research.md`):
 
 **Purpose**: Stage 4 of the pipeline. Figures 5–6 + Tables 1–2.
 
-- [ ] T038 Create `notebooks/04_mixed_layer_response.ipynb`; first-cell install + AI-disclosure header. Include `gsw` in the install cell.
-- [ ] T039 Compute potential density `σθ` for both products using `gsw` from T, S, pressure.
-- [ ] T040 Compute **MLD** using de Boyer Montégut density threshold (Δσθ = 0.03 kg m⁻³ from a 10 m reference). Implement as a small function — if ≥20 lines, move to `src/mld.py` with a pytest test.
-- [ ] T041 Compute the ΔT = 0.2 °C MLD as a **sensitivity check** (per research.md); include both series on the MLD plot and note the difference in text.
-- [ ] T042 Compute surface-layer mean T and S time series (depth-weighted mean over 0 → 10 m).
-- [ ] T043 Define sub-windows: pre-storm (2025-08-15 → 2025-08-20), storm (2025-08-20 → 2025-08-22), recovery (2025-08-22 → 2025-08-29). Compute bias, RMSE, correlation per sub-window for surface T, surface S, and MLD — include sample size N.
-- [ ] T044 Generate **Figure 5** — MLD time series, obs vs. DOPPIO, both criteria overlaid, with sub-window shading. Caption.
-- [ ] T045 Generate **Figure 6** — surface T and S time series, obs vs. DOPPIO, with sub-window shading and CPA marked. Caption.
-- [ ] T046 Generate **Table 1** — `outputs/tables/001-erin-mab-response/comparison_stats.csv` (columns: `variable, subwindow, bias, rmse, correlation, N`).
-- [ ] T047 Generate **Table 2** — `outputs/tables/001-erin-mab-response/data_provenance.csv` (obs path, DOPPIO URL + retrieval date, NHC TCR URL, MLD criterion used, alignment cadence).
-- [ ] T048 **QC**: Peak surface cooling and MLD deepening should align (±a few hours) with CPA (2025-08-21 12:00 UTC). If obs and DOPPIO disagree on timing, document — this is a **result**, not a bug.
-- [ ] T049 **QC**: Sample sizes ≥ something reasonable (e.g., ≥12 hourly samples per sub-window). Flag any sub-window with insufficient data.
-- [ ] T050 **QC**: Verify all expected spec outputs are present (6 figures + 2 tables under `outputs/{figures,tables}/001-erin-mab-response/`).
+- [x] T038 Create `notebooks/04_mixed_layer_response.ipynb`; first-cell install + AI-disclosure header. Include `gsw` in the install cell.
+- [x] T039 Compute potential density `σθ` for both products using `gsw` from T, S, pressure.
+- [x] T040 Compute **MLD** using de Boyer Montégut density threshold (Δσθ = 0.03 kg m⁻³ from a 10 m reference). Implement as a small function — if ≥20 lines, move to `src/mld.py` with a pytest test.
+- [x] T041 Compute the ΔT = 0.2 °C MLD as a **sensitivity check** (per research.md); include both series on the MLD plot and note the difference in text.
+- [x] T042 Compute surface-layer mean T and S time series (depth-weighted mean over 0 → 10 m).
+- [x] T043 Define sub-windows: pre-storm (2025-08-15 → 2025-08-20), storm (2025-08-20 → 2025-08-22), recovery (2025-08-22 → 2025-08-29). Compute bias, RMSE, correlation per sub-window for surface T, surface S, and MLD — include sample size N.
+- [x] T044 Generate **Figure 5** — MLD time series, obs vs. DOPPIO, both criteria overlaid, with sub-window shading. Caption.
+- [x] T045 Generate **Figure 6** — surface T and S time series, obs vs. DOPPIO, with sub-window shading and CPA marked. Caption.
+- [x] T046 Generate **Table 1** — `outputs/tables/001-erin-mab-response/comparison_stats.csv` (columns: `variable, subwindow, bias, rmse, correlation, N`).
+- [x] T047 Generate **Table 2** — `outputs/tables/001-erin-mab-response/data_provenance.csv` (obs path, DOPPIO URL + retrieval date, NHC TCR URL, MLD criterion used, alignment cadence).
+- [x] T048 **QC**: Peak surface cooling and MLD deepening should align (±a few hours) with CPA (2025-08-21 12:00 UTC). If obs and DOPPIO disagree on timing, document — this is a **result**, not a bug.
+- [x] T049 **QC**: Sample sizes ≥ something reasonable (e.g., ≥12 hourly samples per sub-window). Flag any sub-window with insufficient data.
+- [x] T050 **QC**: Verify all expected spec outputs are present (6 figures + 2 tables under `outputs/{figures,tables}/001-erin-mab-response/`).
 
 **Checkpoint**: Figures 5–6 and Tables 1–2 generated; comparison timing sanity-checked; all 6 figures + 2 tables in place.
 
