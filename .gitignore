@@ -23,3 +23,8 @@ outputs/data/**/*.nc
 outputs/data/**/*.zarr
 outputs/data/**/*.parquet
 outputs/data/**/*.pdf
+
+# Methods / review docs kept local-only (not pushed to public repo).
+# The constitution PDF + its source md remain tracked intentionally.
+outputs/docs/methods_*.md
+outputs/docs/methods_*.pdf
