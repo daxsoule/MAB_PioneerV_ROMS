@@ -28,11 +28,16 @@ tuned to climatology rather than to individual storms.
 ### Primary Data — Observations
 
 - **Source**: OOI Coastal Pioneer MAB South (Coastal Virginia) Array,
-  focal profiler mooring **`CP13NOPM-WFP01-03-CTDPFK000`** — a
-  wire-following profiler CTD on site CP13N of the MAB South array.
-  (Full site-code decoding — nominal depth range, position, and
-  intended deployment cadence — to be confirmed from the OOI asset
-  catalog at the download step.)
+  site CP13NOPM (North Offshore Profiler Mooring). **Two CTD assets
+  on the same mooring, same deployment**:
+  - **`CP13NOPM-WFP01-03-CTDPFK000`** — wire-following profiler CTD.
+    Depth-resolved **25–79 m** (top bumper well below surface by
+    mechanical design).
+  - **`CP13NOPM-SBI01-02-CTDMOS011`** — cable-mounted near-surface
+    CTD at **~0.5 m** depth. Single-depth point measurement of
+    surface T/S.
+  - **Depth gap 0.5–25 m** is unsampled on this mooring — documented
+    limitation (see Limitations).
 - **Coverage**: **2025-08-15 to 2025-08-29** (14 days). Event anchor is
   Erin's closest approach at **2025-08-21 12:00 UTC** (~378 km SE of
   the array, Cat 2 at CPA, storm ID AL052025). Pre-storm buffer
@@ -221,6 +226,12 @@ AL052025, commit `52eeff5`):
   scope for spec 001 (may be revisited in a future spec).
 
 **Limitations**:
+- **Observation gap 0.5–25 m**: CP13NOPM samples the near-surface
+  (SBI01 at ~0.5 m) and the subsurface column (WFP01 at 25–79 m)
+  but not the 0.5–25 m layer in between. Pre-storm mixed-layer depth
+  (typically ~5–15 m in MAB summer) may fall entirely within this gap.
+  Mixed-layer deepening past 25 m is resolved; shallower dynamics are
+  inferred from surface T/S only.
 - One mooring does not constrain horizontal structure of the response.
 - Model–observation disagreements are hypotheses, not corrections —
   per the constitution's "Model Humility" principle.

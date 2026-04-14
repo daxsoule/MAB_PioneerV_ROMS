@@ -52,17 +52,39 @@ notebook 02 and re-runs downstream in seconds.
 ## Phase 0.2 — CP13N deployment coverage
 
 **Status update (2026-04-14)**: Local kdata inspection resolved the
-deployment question without a round-trip to OOI Data Explorer. The
-deployment0002 aggregate NetCDF of the recovered wire-following
-profiler stream spans **2025-04-15 → 2025-11-06** — the entire 2025
-Atlantic hurricane season. So Erin is covered by a recovered (i.e.,
-post-deployment, calibrated, QARTOD'd) stream.
+deployment question without a round-trip to OOI Data Explorer.
+deployment0002 recovered streams cover 2025-04-15 → 2025-11-06 —
+the full 2025 Atlantic hurricane season, post-deployment calibrated
+and QARTOD'd.
 
-**Decision (default)**: Read deployment0002 from
-`/home/jovyan/ooi/kdata/CP13NOPM-WFP01-03-CTDPFK000-recovered_wfp-ctdpf_ckl_wfp_instrument_recovered/`
-directly. The depth-coverage audit still runs in notebook 02 before
-downstream stages — the deployment being long does not guarantee
-surface → ≥50 m coverage at every profile.
+**Depth coverage finding (T019, 2026-04-14)**: WFP01 CTDPFK (wire-
+following profiler) samples **25–79 m** only — its top bumper sits
+well below the surface by mechanical design. Original plan assumed
+"surface → ≥50 m"; the surface half is not reached by this asset.
+
+**Decision (user-approved 2026-04-14)**: Add `CP13NOPM-SBI01-02-CTDMOS011`
+(cable-mounted CTD at ~0.5 m) as a near-surface companion on the same
+mooring. Same deployment0002 window, same lat/lon, also in kdata.
+
+**Combined observation coverage**:
+
+| Depth band | Source | Resolution |
+|---|---|---|
+| ~0.5 m | SBI01 CTDMOS | Single-depth point, ~5-min cadence |
+| 0.5–25 m | **GAP** — not sampled on CP13NOPM | n/a |
+| 25–79 m | WFP01 CTDPFK | Profile, ~3-hour cadence |
+
+**Consequences for MLD analysis**: Pre-storm MLD in MAB summer is
+typically 5–15 m, i.e., entirely within the gap. Storm-driven MLD
+deepening *past 25 m* is resolved; shallower dynamics are inferred
+from surface T/S (SBI01) only, without a direct MLD estimate.
+
+**Fallbacks if scope grows**:
+1. CP15MOAS gliders may have profiled near CP13N during Erin. A
+   glider deployment starting 2025-08-14 is in kdata; position
+   screening deferred to a future spec.
+2. Adjacent CP11 site surface moorings (CP11NOSM, CP11SOSM) —
+   different location but closes the 0–25 m gap. Changes scope.
 
 **Fallback plan** if the audit fails (depth range too shallow or too
 gappy):

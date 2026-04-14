@@ -46,9 +46,9 @@ All three original open questions are resolved (see `research.md`):
 
 - [ ] T008 Create `notebooks/01_download_erin_data.ipynb`.
 - [ ] T009 First-cell install per constitution: pinned versions of `xarray`, `netCDF4`, `numpy`, `pandas`, `requests`, `pyarrow`, `plotly`. Include the AI-disclosure header in the first markdown cell.
-- [ ] T010 Open CP13N deployment0002 aggregate from `/home/jovyan/ooi/kdata/CP13NOPM-WFP01-03-CTDPFK000-recovered_wfp-ctdpf_ckl_wfp_instrument_recovered/`; swap dim `obs` → `time` if present.
-- [ ] T011 Subset CP13N to event window 2025-08-15 to 2025-08-29 UTC; write to `outputs/data/raw/CP13NOPM_WFP01_03_CTDPFK000_erin.nc`.
-- [ ] T012 Read CP13N lat/lon from the NetCDF (or the asset-catalog JSON if absent) and record them for DOPPIO lookup.
+- [x] T010 Open CP13N deployment0002 aggregates from kdata — **both WFP01 CTDPFK (profiler, 25–79 m) and SBI01 CTDMOS (near-surface ~0.5 m)**. Added SBI01 per user 2026-04-14 after T019 revealed WFP does not reach the surface.
+- [x] T011 Subset both streams to event window 2025-08-15 to 2025-08-29; write to `outputs/data/raw/CP13NOPM-WFP01-03-CTDPFK000_erin.nc` and `CP13NOPM-SBI01-02-CTDMOS011_erin.nc`.
+- [x] T012 Extract CP13N lat/lon from WFP record (same mooring, same for SBI). Recorded in notebook for DOPPIO lookup.
 - [ ] T013 Download NHC TCR for Erin (AL052025) to `outputs/data/raw/AL052025_Erin_TCR.pdf`. Extract Table 1 6-hourly positions to `outputs/data/raw/erin_nhc_besttrack.csv` (columns: `datetime_utc, lat, lon, max_wind_kt, min_slp_mb, status`).
 - [ ] T014 Open DOPPIO OPeNDAP dataset at `https://tds.marine.rutgers.edu/thredds/dodsC/roms/doppio/2017_da/his/History_Best` with `xarray.open_dataset(..., chunks={...})`.
 - [ ] T015 Nearest-neighbour lookup on `lon_rho`/`lat_rho` to CP13N position → `(xi0, eta0)`. Subset with a small index buffer (e.g., ±3 cells) and time slice 2025-08-15 to 2025-08-29.

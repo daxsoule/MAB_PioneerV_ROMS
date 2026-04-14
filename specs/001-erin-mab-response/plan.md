@@ -137,16 +137,21 @@ Decisions and alternatives recorded in `research.md`.
 
 **Observations (no download — local mirror available)**:
 
-- **Source**: `/home/jovyan/ooi/kdata/CP13NOPM-WFP01-03-CTDPFK000-recovered_wfp-ctdpf_ckl_wfp_instrument_recovered/`
-- **Deployment covering Erin**: `deployment0002_*_20250415T180015-20251106T152833.nc`
-  (aggregate file; ~2025-04-15 through 2025-11-06 — entire Atlantic
-  hurricane season of 2025).
-- **Action**: Read the deployment0002 aggregate NetCDF directly,
-  subset to the event window in memory, write the subset to
-  `outputs/data/raw/CP13NOPM_WFP01_03_CTDPFK000_erin.nc`.
-- **Fallback**: If recovered has a gap around the storm, use
-  telemetered (`.../telemetered-ctdpf_ckl_wfp_instrument/`, deployment0002)
-  with a note.
+Two CTD assets on site CP13NOPM, same deployment:
+
+- **WFP01 CTDPFK (profiler)**:
+  `/home/jovyan/ooi/kdata/CP13NOPM-WFP01-03-CTDPFK000-recovered_wfp-ctdpf_ckl_wfp_instrument_recovered/`
+  deployment0002 aggregate — depth range 25–79 m.
+- **SBI01 CTDMOS (near-surface cable CTD)**:
+  `/home/jovyan/ooi/kdata/CP13NOPM-SBI01-02-CTDMOS011-recovered_inst-ctdmo_ghqr_instrument_recovered/`
+  deployment0002 aggregate — fixed depth ~0.5 m.
+
+Both span 2025-04-15 → 2025-11-06. Read both, subset to the event
+window, write separate NetCDF outputs. Depth gap 0.5–25 m is
+unsampled on this mooring (documented limitation in spec).
+
+**Fallback**: If recovered stream has a gap around the storm for
+either asset, use telemetered with a note.
 
 **Downloads**:
 
