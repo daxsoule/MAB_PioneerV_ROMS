@@ -17,7 +17,15 @@ wheels/
 .venv/
 .DS_Store
 
-# Large data caches — keep raw downloads out of git
-outputs/data/*.nc
-outputs/data/*.zarr
-outputs/data/*.parquet
+# Large data caches — keep raw downloads and processed slices out of git
+# (matches files in outputs/data/ and any subdir like raw/, processed/)
+outputs/data/**/*.nc
+outputs/data/**/*.zarr
+outputs/data/**/*.parquet
+outputs/data/**/*.pdf
+
+# Methods / review docs kept local-only (not pushed to public repo).
+# The constitution PDF + its source md remain tracked intentionally.
+outputs/docs/methods_*.md
+outputs/docs/methods_*.pdf
+outputs/data/raw/.nfs*

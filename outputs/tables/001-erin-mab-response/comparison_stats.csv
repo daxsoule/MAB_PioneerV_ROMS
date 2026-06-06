@@ -1,0 +1,13 @@
+variable,subwindow,N,bias,rmse,r,reference_depth_m,notes
+surface_T,pre-storm,120,-0.332,0.511,0.729,0.5,SBI vs DOPPIO at ~0.5 m
+surface_S,pre-storm,120,-0.857,0.906,-0.27,0.5,SBI vs DOPPIO at ~0.5 m
+MLD_sigma_all,pre-storm,40,-3.448,4.125,0.07,25.0,"all codes; obs_atmin=0, mod_atmin=0, obs_nocrit=0, mod_nocrit=0"
+MLD_sigma_ok_only,pre-storm,40,-3.448,4.125,0.07,25.0,restricted to code==ok on both sides
+surface_T,storm,48,-0.028,0.494,0.737,0.5,SBI vs DOPPIO at ~0.5 m
+surface_S,storm,48,-0.205,0.313,0.463,0.5,SBI vs DOPPIO at ~0.5 m
+MLD_sigma_all,storm,16,-2.546,3.244,0.076,25.0,"all codes; obs_atmin=0, mod_atmin=0, obs_nocrit=0, mod_nocrit=0"
+MLD_sigma_ok_only,storm,16,-2.546,3.244,0.076,25.0,restricted to code==ok on both sides
+surface_T,recovery,168,0.284,0.791,0.5,0.5,SBI vs DOPPIO at ~0.5 m
+surface_S,recovery,168,0.292,0.462,0.126,0.5,SBI vs DOPPIO at ~0.5 m
+MLD_sigma_all,recovery,48,-2.444,3.201,0.416,25.0,"all codes; obs_atmin=0, mod_atmin=0, obs_nocrit=1, mod_nocrit=0"
+MLD_sigma_ok_only,recovery,48,-2.444,3.201,0.416,25.0,restricted to code==ok on both sides
